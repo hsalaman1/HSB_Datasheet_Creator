@@ -1,1066 +1,1122 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>HSB Datasheet Creator</title>
-  <style>
-    /* ── RESET ───────────────────────────────────────────────────────── */
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: Arial, Helvetica, sans-serif; background: #f0f2f5; color: #222; }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HSB Datasheet Creator</title>
+<style>
+/* =====================================================================
+   CREATOR UI
+===================================================================== */
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  color: #222;
+  font-size: 14px;
+}
+#creator {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 32px 20px 60px;
+}
+h1 { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.subtitle { font-size: 13px; color: #666; margin-bottom: 32px; }
+.section { margin-bottom: 32px; }
+.section-title {
+  font-size: 14px;
+  font-weight: 700;
+  border-bottom: 2px solid #222;
+  padding-bottom: 6px;
+  margin-bottom: 16px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+label {
+  display: block;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  color: #555;
+  margin-bottom: 4px;
+}
+input[type="text"],
+input[type="date"],
+input[type="number"],
+select,
+textarea {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fafafa;
+  color: #222;
+}
+input[type="text"]:focus,
+input[type="date"]:focus,
+input[type="number"]:focus,
+select:focus,
+textarea:focus {
+  outline: none;
+  border-color: #333;
+  background: #fff;
+}
+textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
+.form-row {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.form-row .form-group { flex: 1; min-width: 180px; }
+.form-group { margin-bottom: 14px; }
 
-    /* ── CREATOR PANEL ───────────────────────────────────────────────── */
-    #creator-panel { max-width: 780px; margin: 0 auto; padding: 24px 16px 60px; }
+/* Sheet type toggle */
+.sheet-type-wrap { display: flex; gap: 8px; margin-bottom: 0; }
+.sheet-type-btn {
+  flex: 1;
+  padding: 10px 14px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: all 0.15s;
+  color: #555;
+  text-align: center;
+}
+.sheet-type-btn:hover { border-color: #333; color: #222; }
+.sheet-type-btn.active { border-color: #222; background: #222; color: #fff; }
 
-    .creator-header {
-      background: #1a3a5c; color: white; padding: 22px 28px;
-      border-radius: 12px; margin-bottom: 22px; text-align: center;
-    }
-    .creator-header h1 { font-size: 24px; margin-bottom: 4px; }
-    .creator-header p { font-size: 13px; opacity: 0.8; }
+/* Schedule preset buttons */
+.sched-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+.sched-btn {
+  padding: 8px 16px;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: all 0.15s;
+  color: #333;
+}
+.sched-btn:hover  { border-color: #333; }
+.sched-btn.active { border-color: #222; background: #222; color: #fff; }
+#custom-time-row { display: none; }
+#custom-time-row.visible { display: flex; gap: 16px; }
 
-    .step-card {
-      background: white; border-radius: 10px; padding: 22px;
-      margin-bottom: 16px; box-shadow: 0 1px 5px rgba(0,0,0,0.09);
-    }
-    .step-card h2 {
-      font-size: 14px; font-weight: 700; color: #1a3a5c;
-      margin-bottom: 14px; padding-bottom: 9px;
-      border-bottom: 2px solid #e8f0fe;
-      display: flex; align-items: center; gap: 10px;
-    }
-    .step-badge {
-      background: #1a3a5c; color: white; width: 26px; height: 26px;
-      border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; font-size: 12px; flex-shrink: 0;
-    }
-    .step-desc { font-size: 12px; color: #666; margin-bottom: 14px; line-height: 1.5; }
+/* Behavior items */
+.behavior-item {
+  border: 1.5px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+.behavior-item.crisis-item { border-color: #999; background: #fafafa; }
+.behavior-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  cursor: pointer;
+  user-select: none;
+  background: #fff;
+}
+.behavior-header:hover { background: #f5f5f5; }
+.crisis-item .behavior-header { background: #f5f5f5; }
+.beh-check {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  accent-color: #333;
+  cursor: pointer;
+}
+.beh-check:disabled { cursor: not-allowed; opacity: 0.6; }
+.beh-name-display {
+  font-size: 13px;
+  font-weight: 700;
+  flex: 1;
+  pointer-events: none;
+}
+.badge {
+  font-size: 10px;
+  font-weight: 600;
+  padding: 2px 8px;
+  border-radius: 10px;
+  white-space: nowrap;
+}
+.badge-freq  { background: #eaf5ea; color: #2a6a2a; border: 1px solid #b5d8b5; }
+.badge-dur   { background: #eaecf8; color: #2a3a8a; border: 1px solid #b5bfe8; }
+.badge-fixed { background: #f0f0f0; color: #555; border: 1px solid #ccc; font-size: 9px; }
+.expand-arrow { font-size: 9px; color: #aaa; flex-shrink: 0; }
+.behavior-body {
+  display: none;
+  padding: 12px 14px 14px;
+  border-top: 1px solid #e8e8e8;
+  background: #fff;
+}
+.behavior-body.open { display: block; }
+.meas-toggle { display: flex; gap: 8px; margin-top: 6px; }
+.meas-btn {
+  flex: 1;
+  padding: 7px;
+  text-align: center;
+  border: 1.5px solid #ccc;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  background: #fff;
+  transition: all 0.15s;
+  color: #333;
+}
+.meas-btn:hover { border-color: #333; }
+.meas-btn.active { border-color: #222; background: #222; color: #fff; }
+.remove-beh-btn {
+  display: inline-block;
+  margin-top: 10px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #c00;
+  font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-decoration: underline;
+  padding: 0;
+}
+.remove-beh-btn:hover { color: #900; }
 
-    /* Sheet type toggle */
-    .sheet-type-row { display: flex; gap: 10px; margin-bottom: 0; }
-    .sheet-type-btn {
-      flex: 1; padding: 11px 8px; border: 2px solid #ddd; border-radius: 8px;
-      background: #f9f9f9; cursor: pointer; font-size: 13px; font-weight: 600;
-      color: #555; transition: all 0.18s; text-align: center;
-      font-family: Arial, sans-serif;
-    }
-    .sheet-type-btn.active { border-color: #1a3a5c; background: #e8f0fe; color: #1a3a5c; }
+/* Add custom button */
+.add-btn {
+  width: 100%;
+  padding: 10px;
+  border: 1.5px dashed #aaa;
+  border-radius: 4px;
+  background: #fff;
+  cursor: pointer;
+  font-size: 13px;
+  font-family: Arial, Helvetica, sans-serif;
+  color: #666;
+  margin-top: 8px;
+  transition: all 0.15s;
+}
+.add-btn:hover { border-color: #333; color: #333; }
 
-    /* Form fields */
-    .form-row { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
-    .form-row label {
-      font-size: 12px; font-weight: 600; color: #555; min-width: 95px;
-      text-transform: uppercase; letter-spacing: 0.3px;
-    }
-    .form-row input[type="text"],
-    .form-row input[type="date"],
-    .form-row select {
-      flex: 1; padding: 8px 10px; border: 1.5px solid #ddd;
-      border-radius: 6px; font-size: 13px; font-family: Arial, sans-serif; background: #fafafa;
-    }
-    .form-row input:focus, .form-row select:focus {
-      outline: none; border-color: #1a3a5c; background: white;
-    }
-    .form-hint { font-size: 11px; color: #888; margin-top: -7px; margin-bottom: 10px; padding-left: 105px; }
+/* QR upload */
+.qr-drop {
+  border: 1.5px dashed #ccc;
+  border-radius: 4px;
+  padding: 22px 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.qr-drop:hover { border-color: #333; background: #fafafa; }
+.qr-drop p { font-size: 13px; color: #777; margin-top: 4px; }
+#qr-preview-wrap { display: none; margin-top: 14px; text-align: center; }
+#qr-preview-img  { max-width: 100px; max-height: 100px; border: 1px solid #ddd; border-radius: 4px; }
+.qr-remove {
+  display: block; margin: 6px auto 0;
+  background: none; border: none; cursor: pointer;
+  color: #c00; font-size: 12px;
+  font-family: Arial, Helvetica, sans-serif;
+  text-decoration: underline;
+}
 
-    /* Schedule grid */
-    .schedule-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 8px; }
-    .sched-btn {
-      padding: 10px 4px; border: 1.5px solid #ddd; border-radius: 8px;
-      background: #f9f9f9; cursor: pointer; font-size: 11px; font-weight: 600;
-      text-align: center; transition: all 0.15s; font-family: Arial, sans-serif; color: #444;
-    }
-    .sched-times { font-size: 9px; color: #888; margin-top: 3px; font-weight: 400; }
-    .sched-btn.active { border-color: #1a3a5c; background: #1a3a5c; color: white; }
-    .sched-btn.active .sched-times { color: rgba(255,255,255,0.8); }
-    #custom-times { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed #ddd; }
+/* Generate button */
+.generate-btn {
+  width: 100%;
+  padding: 14px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 700;
+  font-family: Arial, Helvetica, sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.5px;
+  transition: background 0.15s;
+}
+.generate-btn:hover { background: #000; }
 
-    /* Behavior cards */
-    #behaviors-list { display: flex; flex-direction: column; gap: 13px; margin-bottom: 12px; }
-    .behavior-card {
-      border: 1.5px solid #e0e0e0; border-radius: 9px;
-      padding: 15px; background: #fafafa;
-    }
-    .behavior-card.crisis-card { border-color: #7c3aed; background: #faf5ff; }
-    .card-header {
-      display: flex; justify-content: space-between;
-      align-items: center; margin-bottom: 13px;
-    }
-    .card-title { font-size: 13px; font-weight: 700; color: #1a3a5c; display: flex; align-items: center; gap: 8px; }
-    .card-title.crisis-title { color: #7c3aed; }
-    .card-num {
-      background: #1a3a5c; color: white; width: 22px; height: 22px;
-      border-radius: 50%; display: flex; align-items: center;
-      justify-content: center; font-size: 11px; font-weight: 700; flex-shrink: 0;
-    }
-    .crisis-num { background: #7c3aed !important; }
-    .remove-btn {
-      background: #fee2e2; color: #dc2626; border: none; width: 28px; height: 28px;
-      border-radius: 6px; cursor: pointer; font-size: 16px; font-weight: 700;
-      display: flex; align-items: center; justify-content: center; transition: background 0.15s;
-    }
-    .remove-btn:hover { background: #fca5a5; }
+/* =====================================================================
+   PREVIEW BAR
+===================================================================== */
+#preview-section { display: none; }
+.preview-bar {
+  background: #222;
+  color: #fff;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.preview-bar h2 { font-size: 16px; }
+.preview-actions { display: flex; gap: 10px; }
+.btn-back, .btn-print {
+  padding: 8px 18px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 700;
+  font-family: Arial, Helvetica, sans-serif;
+  transition: all 0.15s;
+}
+.btn-back  { background: transparent; color: #fff; border: 1.5px solid #fff; }
+.btn-back:hover  { background: rgba(255,255,255,0.15); }
+.btn-print { background: #fff; color: #222; border: 1.5px solid #fff; }
+.btn-print:hover { background: #ddd; }
+.preview-bg {
+  background: #777;
+  padding: 24px;
+  min-height: 500px;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  overflow-x: auto;
+}
 
-    .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 11px; }
-    .form-group:last-child { margin-bottom: 0; }
-    .form-group label {
-      font-size: 11px; font-weight: 600; color: #666;
-      text-transform: uppercase; letter-spacing: 0.3px;
-    }
-    .form-group input[type="text"],
-    .form-group select,
-    .form-group textarea {
-      padding: 7px 10px; border: 1.5px solid #ddd; border-radius: 6px;
-      font-size: 13px; font-family: Arial, sans-serif; background: white;
-    }
-    .form-group textarea { resize: vertical; min-height: 68px; line-height: 1.4; }
-    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
-      outline: none; border-color: #1a3a5c;
-    }
-    .library-select { color: #1a3a5c; font-weight: 600; }
+/* =====================================================================
+   GENERATED DATASHEET  (shared by both sheet types)
+===================================================================== */
+#datasheet {
+  background: white;
+  width: 10.5in;
+  min-height: 7.5in;
+  padding: 0.38in 0.4in;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 10px;
+  display: flex;
+  flex-direction: column;
+  flex-shrink: 0;
+}
 
-    /* Measurement toggle */
-    .meas-toggle { display: flex; gap: 6px; }
-    .meas-btn {
-      flex: 1; padding: 7px 4px; border: 1.5px solid #ddd; border-radius: 6px;
-      background: white; cursor: pointer; font-size: 12px; font-weight: 600;
-      transition: all 0.15s; font-family: Arial, sans-serif; color: #444;
-    }
-    .meas-btn.freq-active { border-color: #1a3a5c; background: #1a3a5c; color: white; }
-    .meas-btn.dur-active { border-color: #7c3aed; background: #7c3aed; color: white; }
-    .badge-dur {
-      background: #7c3aed; color: white; font-size: 10px; font-weight: 700;
-      padding: 2px 8px; border-radius: 99px; margin-left: 6px;
-    }
+/* ── BEHAVIOR SHEET ─────────────────────────────────────────── */
+.ds-body {
+  display: flex;
+  gap: 8px;
+  flex: 1;
+}
+.ds-main { flex: 1; min-width: 0; }
+.ds-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+}
+.ds-table td,
+.ds-table th {
+  border: 1px solid #222;
+  padding: 2px 3px;
+  font-size: 9.5px;
+  vertical-align: middle;
+  overflow: hidden;
+  word-break: break-word;
+}
+.h1-date    { font-weight: 700; font-size: 10.5px; white-space: nowrap; }
+.h1-middle  { padding: 4px; }
+.h1-student { font-weight: 700; font-size: 10.5px; text-align: center; }
+.h1-initials{ font-weight: 700; font-size: 16px; text-align: center; letter-spacing: 2px; }
+.h2-freq { font-size: 8.5px; padding: 3px 5px; }
+.h2-dur  { font-size: 8.5px; padding: 3px 5px; }
+.h3-th {
+  font-weight: 700;
+  font-size: 9px;
+  text-align: center;
+  padding: 4px 2px;
+  background: #fff;
+}
+.time-row td { height: 38px; }
+.time-cell { font-weight: 700; text-align: right; padding-right: 5px; font-size: 9px; white-space: nowrap; width: 60px; }
+.total-row td { font-weight: 700; font-size: 9.5px; padding: 4px 4px; }
+.notes-row td {
+  font-weight: 700;
+  font-size: 9.5px;
+  vertical-align: top;
+  padding: 5px 6px;
+  height: 161px;
+}
+.notes-lines {
+  margin-top: 5px;
+  height: 137px;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    transparent, transparent 16px,
+    #d0d0d0 16px, #d0d0d0 17px
+  );
+}
+.ds-defs {
+  width: 192px;
+  flex-shrink: 0;
+  border: 1px solid #222;
+  padding: 6px 7px;
+  font-size: 8.5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  line-height: 1.3;
+}
+.def-entry { }
+.def-name { font-weight: 700; text-decoration: underline; display: block; margin-bottom: 2px; font-size: 9px; }
 
-    /* Add behavior button */
-    .add-behavior-btn {
-      width: 100%; padding: 11px; border: 2px dashed #1a3a5c;
-      border-radius: 8px; background: white; color: #1a3a5c;
-      cursor: pointer; font-size: 13px; font-weight: 700;
-      transition: background 0.15s; font-family: Arial, sans-serif;
-    }
-    .add-behavior-btn:hover { background: #e8f0fe; }
+/* ── ABC SHEET ──────────────────────────────────────────────── */
+.abc-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid #222;
+  padding: 5px 10px;
+  margin-bottom: 5px;
+}
+.abc-header-title { font-size: 13px; font-weight: 700; }
+.abc-header-student { font-size: 16px; font-weight: 700; letter-spacing: 2px; }
+.abc-header-date { font-size: 11px; color: #444; }
+.abc-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  flex: 1;
+}
+.abc-table th, .abc-table td {
+  border: 1px solid #222;
+  padding: 3px 5px;
+  font-size: 9.5px;
+  vertical-align: top;
+}
+.abc-table th { font-weight: 700; text-align: center; background: #fff; padding: 5px 4px; }
+.abc-table .abc-sub { font-size: 7.5px; font-weight: 400; color: #666; font-style: italic; display: block; }
+.abc-table td { height: 38px; }
 
-    /* QR upload */
-    .qr-upload-area {
-      border: 2px dashed #ddd; border-radius: 8px; padding: 22px;
-      text-align: center; cursor: pointer; transition: all 0.15s; background: #fafafa;
-    }
-    .qr-upload-area:hover { border-color: #1a3a5c; background: #e8f0fe; }
-    .qr-upload-area p { font-size: 13px; color: #666; }
-    .qr-upload-area strong { color: #1a3a5c; }
-    #qr-preview-wrap { display: none; margin-top: 12px; text-align: center; }
-    #qr-preview-img { max-width: 100px; max-height: 100px; border: 1px solid #ddd; border-radius: 6px; }
-    .remove-qr-btn {
-      display: block; margin: 7px auto 0; background: #fee2e2; color: #dc2626;
-      border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 12px;
-    }
+/* ── SHARED FOOTER ──────────────────────────────────────────── */
+.ds-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 5px;
+}
+.qr-box {
+  width: 80px;
+  height: 80px;
+  border: 1px solid #bbb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 8px;
+  color: #bbb;
+  text-align: center;
+  flex-shrink: 0;
+}
+.qr-box img { max-width: 78px; max-height: 78px; }
+.hsb-label  { font-size: 8px; color: #888; font-style: italic; }
 
-    /* ABC rows input */
-    .abc-rows-row { display: flex; align-items: center; gap: 10px; }
-    .abc-rows-row input[type="number"] {
-      width: 75px; padding: 7px 10px; border: 1.5px solid #ddd;
-      border-radius: 6px; font-size: 13px; font-family: Arial, sans-serif;
-    }
-
-    /* Error message */
-    .error-msg {
-      color: #dc2626; font-size: 12px; font-weight: 600;
-      padding: 9px 13px; background: #fee2e2; border-radius: 6px;
-      margin-bottom: 10px; display: none;
-    }
-    .error-msg.visible { display: block; }
-
-    /* Generate button */
-    .generate-btn {
-      width: 100%; padding: 15px; background: #1a3a5c; color: white;
-      border: none; border-radius: 9px; cursor: pointer; font-size: 15px;
-      font-weight: 700; letter-spacing: 0.4px; transition: background 0.15s;
-      font-family: Arial, sans-serif;
-    }
-    .generate-btn:hover { background: #0f2540; }
-
-    /* ── PREVIEW PANEL ───────────────────────────────────────────────── */
-    #preview-panel { display: none; }
-    #preview-panel.visible { display: block; }
-
-    .preview-bar {
-      background: #1a3a5c; color: white; padding: 13px 22px;
-      display: flex; align-items: center; justify-content: space-between;
-    }
-    .preview-bar h2 { font-size: 16px; }
-    .preview-bar-actions { display: flex; gap: 10px; }
-    .btn-back {
-      padding: 8px 18px; background: transparent; color: white;
-      border: 2px solid white; border-radius: 6px; cursor: pointer;
-      font-size: 13px; font-weight: 700; transition: background 0.15s;
-      font-family: Arial, sans-serif;
-    }
-    .btn-back:hover { background: rgba(255,255,255,0.15); }
-    .btn-print {
-      padding: 8px 18px; background: white; color: #1a3a5c;
-      border: none; border-radius: 6px; cursor: pointer; font-size: 13px;
-      font-weight: 700; transition: background 0.15s; font-family: Arial, sans-serif;
-    }
-    .btn-print:hover { background: #dbeafe; }
-
-    #preview-container {
-      background: #888; padding: 24px; min-height: 600px;
-      display: flex; justify-content: center; align-items: flex-start;
-    }
-
-    /* ── GENERATED DATASHEET ─────────────────────────────────────────── */
-    #generated-datasheet {
-      background: white; width: 10.5in; min-height: 7.5in;
-      padding: 0.35in; box-shadow: 0 4px 24px rgba(0,0,0,0.35);
-      font-family: Arial, Helvetica, sans-serif; font-size: 10px;
-      display: flex; flex-direction: column;
-    }
-
-    /* Behavior sheet layout */
-    .ds-wrapper { display: flex; flex-direction: row; gap: 5px; flex: 1; align-items: stretch; }
-    .ds-main { flex: 1; display: flex; flex-direction: column; }
-
-    .ds-table { width: 100%; border-collapse: collapse; flex: 1; }
-    .ds-table th, .ds-table td {
-      border: 1px solid #333; padding: 2px 3px;
-      font-family: Arial, Helvetica, sans-serif; font-size: 9px;
-      vertical-align: middle;
-    }
-
-    /* Header row 1: Date / Student / Initials */
-    .ds-hdr1 td { padding: 4px 6px; font-size: 10px; }
-    .date-label { font-weight: 700; }
-    .date-field {
-      display: inline-block; width: 1.4in; border-bottom: 1px solid #333;
-      height: 1em; vertical-align: bottom; margin-left: 3px;
-    }
-    .student-label { font-weight: 700; text-align: center; }
-    .student-initials {
-      font-size: 15px; font-weight: 700; text-align: center; letter-spacing: 2px;
-    }
-
-    /* Header row 2: Frequency / Duration descriptor */
-    .ds-hdr2 td { padding: 3px 5px; font-size: 8.5px; vertical-align: middle; }
-    .freq-label { font-weight: 700; text-decoration: underline; }
-    .dur-label { font-weight: 700; text-decoration: underline; }
-
-    /* Header row 3: Column labels */
-    .ds-hdr3 th { font-weight: 700; font-size: 9px; text-align: center; padding: 4px 3px; }
-
-    /* Time slot rows */
-    .ds-time-row td { height: 38px; vertical-align: top; padding: 2px 3px; }
-    .time-cell {
-      font-weight: 700; text-align: right; font-size: 9px;
-      white-space: nowrap; padding-right: 5px; vertical-align: middle; width: 60px;
-    }
-
-    /* Total row */
-    .ds-total-row td { font-weight: 700; font-size: 9px; padding: 4px 4px; height: 26px; }
-
-    /* Notes row */
-    .ds-notes-row td {
-      height: 88px; vertical-align: top; padding: 4px 6px; font-size: 9px;
-      background-image: repeating-linear-gradient(
-        to bottom, transparent, transparent 17px, #d1d5db 17px, #d1d5db 18px
-      );
-      background-position: 0 22px;
-    }
-    .notes-label {
-      display: block; font-weight: 700; font-size: 9px;
-      background: white; padding-right: 4px; line-height: 1; margin-bottom: 2px;
-    }
-
-    /* Definitions panel */
-    .ds-definitions {
-      width: 2.1in; flex-shrink: 0; display: flex;
-      flex-direction: column; border: 1px solid #333;
-    }
-    .def-item {
-      flex: 1; border-bottom: 1px solid #333; padding: 5px 6px;
-      display: flex; flex-direction: column; overflow: hidden; min-height: 0;
-    }
-    .def-item:last-child { border-bottom: none; }
-    .def-item-name {
-      font-weight: 700; text-decoration: underline; font-size: 9px;
-      margin-bottom: 2px; display: block; line-height: 1.2;
-    }
-    .def-item-text { font-size: 8px; line-height: 1.3; overflow: hidden; color: #222; }
-
-    /* Footer */
-    .ds-footer { display: flex; justify-content: space-between; align-items: flex-end; margin-top: 5px; }
-    .qr-box {
-      width: 82px; height: 82px; border: 1px solid #bbb; display: flex;
-      align-items: center; justify-content: center; font-size: 8px; color: #bbb; overflow: hidden;
-    }
-    .qr-box img { width: 100%; height: 100%; object-fit: contain; }
-    .hsb-label { font-size: 9px; color: #777; font-style: italic; }
-
-    /* ABC sheet */
-    .abc-wrapper { width: 100%; font-family: Arial, Helvetica, sans-serif; }
-    .abc-hdr-row {
-      display: flex; justify-content: space-between; align-items: center;
-      border: 1px solid #333; padding: 5px 10px; margin-bottom: 4px;
-    }
-    .abc-hdr-title { font-size: 13px; font-weight: 700; }
-    .abc-hdr-student { font-size: 15px; font-weight: 700; letter-spacing: 1px; }
-    .abc-hdr-date { font-size: 11px; color: #444; }
-    .abc-table { width: 100%; border-collapse: collapse; }
-    .abc-table th, .abc-table td { border: 1px solid #333; padding: 3px 5px; font-size: 9px; vertical-align: top; }
-    .abc-table th { font-weight: 700; text-align: center; }
-    .abc-table .abc-sub { font-size: 7.5px; font-weight: 400; color: #555; font-style: italic; }
-    .abc-table td { height: 36px; }
-
-    /* ── PRINT ───────────────────────────────────────────────────────── */
-    @media print {
-      #creator-panel { display: none !important; }
-      #preview-panel { display: block !important; }
-      .preview-bar { display: none !important; }
-      #preview-container { background: none !important; padding: 0 !important; display: block !important; }
-      #generated-datasheet { box-shadow: none !important; width: 100% !important; min-height: unset !important; padding: 0.25in !important; }
-      @page { size: landscape; margin: 0; }
-    }
-  </style>
+/* =====================================================================
+   PRINT
+===================================================================== */
+@media print {
+  * { visibility: hidden !important; }
+  #datasheet,
+  #datasheet * { visibility: visible !important; }
+  #datasheet {
+    position: fixed !important;
+    top: 0; left: 0;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 0.35in !important;
+    box-shadow: none !important;
+  }
+  @page {
+    size: 11in 8.5in;
+    margin: 0;
+  }
+}
+</style>
 </head>
 <body>
 
-<!-- ═══════════════ CREATOR PANEL ═══════════════════════════════════════ -->
-<div id="creator-panel">
+<!-- ===================================================================
+     CREATOR INTERFACE
+=================================================================== -->
+<div id="creator">
+  <h1>HSB Datasheet Creator</h1>
+  <p class="subtitle">Fill out the form below, then click Generate to create a print-ready datasheet.</p>
 
-  <div class="creator-header">
-    <h1>HSB Datasheet Creator</h1>
-    <p>Build a custom printable behavior tracking sheet for your student</p>
-  </div>
-
-  <!-- STEP 0: Sheet Type -->
-  <div class="step-card">
-    <h2><span class="step-badge">1</span> Sheet Type</h2>
-    <div class="sheet-type-row">
-      <button class="sheet-type-btn active" id="btn-behavior" onclick="switchSheetType('behavior')">
+  <!-- SHEET TYPE -->
+  <div class="section">
+    <div class="section-title">Sheet Type</div>
+    <div class="sheet-type-wrap">
+      <button class="sheet-type-btn active" id="btn-behavior" onclick="switchType('behavior')">
         Behavior Frequency / Duration
       </button>
-      <button class="sheet-type-btn" id="btn-abc" onclick="switchSheetType('abc')">
+      <button class="sheet-type-btn" id="btn-abc" onclick="switchType('abc')">
         ABC Data Collection
       </button>
     </div>
   </div>
 
-  <!-- STEP 1: Student Info -->
-  <div class="step-card">
-    <h2><span class="step-badge">2</span> Student Information</h2>
+  <!-- STUDENT INFO -->
+  <div class="section">
+    <div class="section-title">Student Information</div>
     <div class="form-row">
-      <label for="student-name">Student Name</label>
-      <input type="text" id="student-name" placeholder="Full name (optional)">
-    </div>
-    <div class="form-row">
-      <label for="student-initials">Initials</label>
-      <input type="text" id="student-initials" placeholder="e.g. JBO" maxlength="6">
-    </div>
-    <p class="form-hint">Initials are auto-derived from the name if left blank.</p>
-    <div class="form-row">
-      <label for="sheet-date">Date</label>
-      <input type="date" id="sheet-date">
-    </div>
-  </div>
-
-  <!-- STEP 2: Schedule (hidden for ABC) -->
-  <div class="step-card" id="step-schedule">
-    <h2><span class="step-badge">3</span> School Schedule</h2>
-    <p class="step-desc">Choose the schedule that matches this student's school day.</p>
-    <div class="schedule-grid">
-      <button class="sched-btn" id="sched-elementary" onclick="selectSchedule('elementary')">
-        Elementary<div class="sched-times">8 AM – 3 PM</div>
-      </button>
-      <button class="sched-btn" id="sched-middle" onclick="selectSchedule('middle')">
-        Middle School<div class="sched-times">9 AM – 4 PM</div>
-      </button>
-      <button class="sched-btn" id="sched-high" onclick="selectSchedule('high')">
-        High School<div class="sched-times">7 AM – 3 PM</div>
-      </button>
-      <button class="sched-btn" id="sched-allday" onclick="selectSchedule('allday')">
-        All Day<div class="sched-times">8 AM – 4 PM</div>
-      </button>
-      <button class="sched-btn" id="sched-custom" onclick="selectSchedule('custom')">
-        Custom<div class="sched-times">Set your own</div>
-      </button>
-    </div>
-    <div id="custom-times">
-      <div class="form-row">
-        <label for="custom-start">Start Time</label>
-        <select id="custom-start">
-          <option>6:00 AM</option><option>6:30 AM</option><option>7:00 AM</option>
-          <option>7:30 AM</option><option selected>8:00 AM</option><option>8:30 AM</option>
-          <option>9:00 AM</option><option>9:30 AM</option><option>10:00 AM</option>
-          <option>10:30 AM</option><option>11:00 AM</option>
-        </select>
-      </div>
-      <div class="form-row">
-        <label for="custom-end">End Time</label>
-        <select id="custom-end">
-          <option>12:00 PM</option><option>12:30 PM</option><option>1:00 PM</option>
-          <option>1:30 PM</option><option>2:00 PM</option><option>2:30 PM</option>
-          <option selected>3:00 PM</option><option>3:30 PM</option><option>4:00 PM</option>
-          <option>4:30 PM</option><option>5:00 PM</option><option>6:00 PM</option>
-        </select>
-      </div>
-    </div>
-  </div>
-
-  <!-- STEP 3: Behaviors (hidden for ABC) -->
-  <div class="step-card" id="step-behaviors">
-    <h2><span class="step-badge">4</span> Behaviors to Track</h2>
-    <p class="step-desc">
-      Add behaviors from the library or create custom ones. You can edit any pre-filled definition.
-      <strong>Crisis is always included as the last column.</strong>
-    </p>
-
-    <div id="behaviors-list"></div>
-
-    <button class="add-behavior-btn" onclick="addBehavior()">+ Add Behavior</button>
-
-    <!-- Crisis card (always present, locked) -->
-    <div class="behavior-card crisis-card" id="crisis-card" style="margin-top:13px;">
-      <div class="card-header">
-        <div class="card-title crisis-title">
-          <span class="card-num crisis-num">C</span>
-          Crisis <span class="badge-dur">Duration</span>
-        </div>
-        <small style="font-size:11px; color:#7c3aed; font-style:italic;">Always last · Locked to Duration</small>
+      <div class="form-group">
+        <label>Student Initials</label>
+        <input type="text" id="student-initials" placeholder="e.g. GYE or JBO" maxlength="10">
       </div>
       <div class="form-group">
-        <label>Definition (editable)</label>
-        <textarea id="crisis-definition" rows="3">When the student engages in multiple problem behaviors either simultaneously or in quick succession over a short period of time. These multiple behaviors can include physical aggression, property destruction, and self-injurious behaviors. Duration recorded in minutes. Format: (5) = 5 min / (3)(4) = 7 min.</textarea>
+        <label>Date (Optional)</label>
+        <input type="date" id="sheet-date">
       </div>
     </div>
   </div>
 
-  <!-- STEP 4: ABC Options (shown only for ABC type) -->
-  <div class="step-card" id="step-abc-opts" style="display:none;">
-    <h2><span class="step-badge">4</span> ABC Sheet Options</h2>
-    <div class="abc-rows-row">
-      <label for="abc-rows">Number of rows:</label>
+  <!-- SCHEDULE (behavior sheet only) -->
+  <div class="section" id="section-schedule">
+    <div class="section-title">Schedule</div>
+    <div class="sched-wrap">
+      <button class="sched-btn" onclick="selectSchedule(this,'elementary')">Elementary (8–3)</button>
+      <button class="sched-btn" onclick="selectSchedule(this,'middle')">Middle School (9–4)</button>
+      <button class="sched-btn" onclick="selectSchedule(this,'high')">High School (7–3)</button>
+      <button class="sched-btn" onclick="selectSchedule(this,'allday')">All Day (8–4)</button>
+      <button class="sched-btn" onclick="selectSchedule(this,'custom')">Custom</button>
+    </div>
+    <div id="custom-time-row">
+      <div class="form-group">
+        <label>Start Time</label>
+        <select id="custom-start">
+          <option>6:00 AM</option><option>7:00 AM</option>
+          <option selected>8:00 AM</option><option>9:00 AM</option><option>10:00 AM</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>End Time</label>
+        <select id="custom-end">
+          <option>1:00 PM</option><option>2:00 PM</option>
+          <option>3:00 PM</option><option selected>4:00 PM</option>
+          <option>5:00 PM</option><option>6:00 PM</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- BEHAVIORS (behavior sheet only) -->
+  <div class="section" id="section-behaviors">
+    <div class="section-title">Behaviors</div>
+    <p style="font-size:12px;color:#666;margin-bottom:14px;">
+      Check the behaviors to include. Click any row to expand and edit its name, definition, or measurement type.
+      <strong>Crisis is always included as the final column.</strong>
+    </p>
+    <div id="behavior-list"></div>
+    <button class="add-btn" onclick="addCustomBehavior()">+ Add Custom Behavior</button>
+  </div>
+
+  <!-- ABC OPTIONS (abc sheet only) -->
+  <div class="section" id="section-abc" style="display:none;">
+    <div class="section-title">ABC Sheet Options</div>
+    <div class="form-group" style="max-width:200px;">
+      <label>Number of Data Rows</label>
       <input type="number" id="abc-rows" value="18" min="5" max="40">
     </div>
   </div>
 
-  <!-- STEP 5: QR Code -->
-  <div class="step-card">
-    <h2><span class="step-badge">5</span> QR Code <span style="font-weight:400;color:#888;font-size:12px;">(optional)</span></h2>
-    <div class="qr-upload-area" onclick="document.getElementById('qr-file-input').click()">
+  <!-- QR CODE -->
+  <div class="section">
+    <div class="section-title">QR Code (Optional)</div>
+    <div class="qr-drop" onclick="document.getElementById('qr-input').click()">
       <p><strong>Click to upload a QR code image</strong></p>
-      <p style="margin-top:4px; font-size:11px;">PNG, JPG, or GIF accepted</p>
+      <p>PNG or JPG — placed in the bottom-left corner of the printed sheet</p>
     </div>
-    <input type="file" id="qr-file-input" accept="image/*" style="display:none" onchange="handleQRUpload(event)">
+    <input type="file" id="qr-input" accept="image/*" style="display:none" onchange="handleQR(event)">
     <div id="qr-preview-wrap">
-      <img id="qr-preview-img" src="" alt="QR Code">
-      <button class="remove-qr-btn" onclick="removeQR()">✕ Remove</button>
+      <img id="qr-preview-img" src="" alt="QR Preview">
+      <button class="qr-remove" onclick="removeQR()">Remove</button>
     </div>
   </div>
 
-  <!-- Error + Generate -->
-  <div class="error-msg" id="error-msg"></div>
-  <button class="generate-btn" onclick="generateDatasheet()">Generate Datasheet →</button>
+  <button class="generate-btn" onclick="generate()">Generate Datasheet</button>
+</div><!-- end #creator -->
 
-</div><!-- end #creator-panel -->
-
-
-<!-- ═══════════════ PREVIEW PANEL ════════════════════════════════════════ -->
-<div id="preview-panel">
+<!-- ===================================================================
+     PREVIEW / PRINT
+=================================================================== -->
+<div id="preview-section">
   <div class="preview-bar">
     <h2>Datasheet Preview</h2>
-    <div class="preview-bar-actions">
-      <button class="btn-back" onclick="showCreator()">← Edit</button>
+    <div class="preview-actions">
+      <button class="btn-back"  onclick="goBack()">&#8592; Edit</button>
       <button class="btn-print" onclick="window.print()">Print / Save PDF</button>
     </div>
   </div>
-  <div id="preview-container">
-    <div id="generated-datasheet"><!-- injected by JS --></div>
+  <div class="preview-bg">
+    <div id="datasheet"><!-- generated here --></div>
   </div>
 </div>
 
-
 <script>
-// ═══════════════════════════════════════════════════════════════
+// ===================================================================
 //  BEHAVIOR LIBRARY
-// ═══════════════════════════════════════════════════════════════
-const BEHAVIOR_LIBRARY = [
+// ===================================================================
+var LIBRARY = [
+  // ── Standard (always shown, defaultOn, cannot remove) ───────────
   {
-    key: 'pa',
-    name: 'Physical Aggression',
-    definition: 'Student makes forceful physical contact with another person using body parts or objects that could cause pain or injury. Examples: hitting, kicking, pushing, biting, throwing objects at others, or pulling hair.',
-    measurement: 'frequency'
+    id: 'pa', name: 'Physical Aggression',
+    definition: 'Student hitting with open/closed hand, kicking, scratching, headbutting, pulling hair, spitting, and throwing items at others. Every instance counts as a single tally.',
+    measurement: 'frequency', defaultOn: true, canRemove: false, alwaysLast: false
   },
   {
-    key: 'pd',
-    name: 'Property Destruction',
-    definition: 'Student engages in actions (throwing, tearing, breaking) that cause or attempt to cause visible damage to physical objects, requiring repair/replacement or rendering item unusable.',
-    measurement: 'frequency'
+    id: 'pd', name: 'Property Destruction',
+    definition: 'Student engages in destruction of property by kicking, punching, and/or throwing items. Every instance of this counts as a single tally.',
+    measurement: 'frequency', defaultOn: true, canRemove: false, alwaysLast: false
   },
   {
-    key: 'el',
-    name: 'Elopement',
-    definition: 'Student exits designated supervised area without permission, moving away from assigned location and does not respond to initial redirection attempt within 10 seconds.',
-    measurement: 'frequency'
+    id: 'el', name: 'Elopement',
+    definition: 'Student leaves the classroom or his/her academic schedule. Every instance of this counts as a single tally.',
+    measurement: 'frequency', defaultOn: true, canRemove: false, alwaysLast: false
+  },
+  // ── Optional library behaviors ───────────────────────────────────
+  {
+    id: 'sib', name: 'Self Injurious Behavior',
+    definition: 'Student engages in behaviors that cause or have the potential to cause physical harm to themselves, including head banging, self-hitting, self-biting, self-scratching, and hair pulling. Every instance counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'rb',
-    name: 'Request Break',
-    definition: 'Student verbally or using a visual card communicates the need to stop an activity or leave the work area temporarily. Could include phrases like "I need a break" or "Can I take a break?"',
-    measurement: 'frequency'
+    id: 'vt', name: 'Verbal Threats',
+    definition: 'Student makes explicit statements about harming others or property that specify a target and action (e.g., "I\'ll hit you," "I\'ll break that") with sufficient intensity to cause concern. Every instance counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'ive',
-    name: 'Inappropriate Verbal Exchanges',
-    definition: 'Any spoken words deliberately used to provoke negative reactions from listeners. Includes making threats, using profanity, directing negative comments at others, or making inflammatory statements specifically to upset or anger the audience.',
-    measurement: 'frequency'
+    id: 'ive', name: 'Inappropriate Verbal Exchanges',
+    definition: 'Any spoken words deliberately used to provoke negative reactions from listeners. Includes making threats, using profanity, directing negative comments at others, or making inflammatory statements specifically to upset or anger the audience. Every instance counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'nfd',
-    name: 'Not Following Directions (NFD)',
-    definition: 'Student actively or passively fails to carry out a clear instruction, task, or directive given by an authority figure and instead engages in alternative behaviors that do not align with the given instruction.',
-    measurement: 'frequency'
+    id: 'vo', name: 'Verbal Outbursts',
+    definition: 'Student speaks at a volume significantly louder than conversational level, disrupting the classroom environment. May include yelling, screaming, or using profanity. Duration exceeds 3 seconds and the behavior is outside expected communication patterns for the setting.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'sr',
-    name: 'Self Regulating',
-    definition: 'Student independently transitions to a designated calming area and uses self-regulation techniques when feeling overwhelmed. Includes using breathing techniques, sensory tools, or quiet time in the cool-down space.',
-    measurement: 'frequency'
+    id: 'nfd', name: 'Not Following Directions (NFD)',
+    definition: 'Student does not comply with a staff directive within 5 seconds of the prompt being given. This includes verbal refusals, ignoring the prompt, or engaging in an incompatible behavior. Every instance counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'tr',
-    name: 'Task Refusal',
-    definition: 'Student verbally states refusal and/or physically rejects materials (pushing away, turning body) for at least 30 consecutive seconds following a clear directive, despite 2+ prompts.',
-    measurement: 'frequency'
+    id: 'tr', name: 'Task Refusal',
+    definition: 'Student refuses to engage with or begin an assigned task by pushing away materials, vocalizing refusal, or turning away from the work area. Refusal persists for at least 30 seconds following the initial directive. Every instance counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'vt',
-    name: 'Verbal Threats',
-    definition: 'Student makes explicit statements about harming others or property that specify target and action (e.g., "I\'ll hit you," "I\'ll break that") with sufficient intensity to cause concern.',
-    measurement: 'frequency'
+    id: 'tc', name: 'Task Completion',
+    definition: 'Student independently completes an assigned academic or non-academic task from start to finish without requiring a staff prompt. Every instance of this counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'ds',
-    name: 'Disrobing / Stripping',
-    definition: 'Student removes one or more clothing items in inappropriate settings and resists redressing for at least 30 seconds or requires 3+ verbal prompts to comply with redressing.',
-    measurement: 'frequency'
+    id: 'rb', name: 'Request Break',
+    definition: 'Student requests for a break appropriately. They can ask for a break, ask for a walk, or preferred person on campus in the absence of problem behaviors. Every instance of this counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'ub',
-    name: 'Unsafe Behaviors',
-    definition: 'Student handles potentially dangerous objects inappropriately (e.g., running with scissors, pencils) or positions body in a way that creates an immediate risk of injury, lasting at least 3 seconds despite verbal redirection.',
-    measurement: 'frequency'
+    id: 'rh', name: 'Request Help / or Alternative',
+    definition: 'Student appropriately requests assistance from staff or an alternative activity using verbal language, hand raising, a visual card, or an AAC device in the absence of problem behaviors. Every instance of this counts as a single tally.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'vo',
-    name: 'Verbal Outbursts',
-    definition: 'Student speaks at a volume significantly louder than conversational level, disrupting the classroom environment. May include yelling, screaming, or using profanity. Duration exceeds 3 seconds.',
-    measurement: 'frequency'
+    id: 'ra', name: 'Requesting Appropriately',
+    definition: 'Student gains teacher attention using a designated signal (raising hand, name card) and waits for acknowledgment before speaking. Uses complete sentences or predetermined communication method to request help, materials, or breaks.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'ssb',
-    name: 'Self-Stimulatory Behavior',
-    definition: 'Repetitive motor movements that serve no apparent functional purpose. Examples: hand-flapping, rocking, spinning objects, finger-flicking near eyes, or making repetitive vocalizations. Occurs for at least 5 consecutive seconds.',
-    measurement: 'frequency'
+    id: 'sr', name: 'Self Regulating',
+    definition: 'Student independently transitions to a designated calming area and uses self-regulation techniques when feeling overwhelmed. This includes using breathing techniques, sensory tools, or quiet time in the designated cool-down space.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'ot',
-    name: 'On Task',
-    definition: "Student's body is oriented toward instructional materials or teacher. Student is actively responding to instruction through writing, verbal responses, or manipulation of materials. Eyes track relevant materials or speaker.",
-    measurement: 'frequency'
+    id: 'ot', name: 'On Task',
+    definition: 'Student\'s body is oriented toward instructional materials or the teacher. Student is actively responding to instruction through writing, verbal responses, or manipulation of materials as directed. Eyes track relevant materials or speaker.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'ave',
-    name: 'Appropriate Verbal Exchanges',
-    definition: 'Student engages with peers using acceptable verbal and nonverbal communication, including maintaining appropriate physical proximity, using conversational tone, taking turns, and responding to peer initiations.',
-    measurement: 'frequency'
+    id: 'ave', name: 'Appropriate Verbal Exchanges',
+    definition: 'Student engages with peers using acceptable verbal and nonverbal communication, including maintaining appropriate physical proximity, using conversational tone, taking turns in conversation, and responding to peer initiations.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'ra',
-    name: 'Requesting Appropriately',
-    definition: 'Student gains teacher attention using designated signal (raising hand, name card) and waits for acknowledgment before speaking. Uses complete sentences or predetermined communication method to request help, materials, or breaks.',
-    measurement: 'frequency'
+    id: 'ds', name: 'Disrobing / Stripping',
+    definition: 'Student removes one or more clothing items in inappropriate settings and resists redressing for at least 30 seconds or requires 3 or more verbal prompts to comply with redressing.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'rh',
-    name: 'Request Help / or Alternative',
-    definition: 'Student uses an appropriate signal, verbal request, or communication device to ask for assistance with a task or to request an alternative activity. Every instance counts as a single tally.',
-    measurement: 'frequency'
+    id: 'ub', name: 'Unsafe Behaviors',
+    definition: 'Student handles potentially dangerous objects inappropriately (e.g., running with scissors, pencils) or positions their body in a way that creates an immediate risk of injury, lasting at least 3 seconds despite verbal redirection.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
   },
   {
-    key: 'tc',
-    name: 'Task Completion',
-    definition: 'Student independently completes an assigned task or activity within the expected time frame without refusing, leaving, or engaging in problem behavior. Every instance counts as a single tally.',
-    measurement: 'frequency'
+    id: 'ssb', name: 'Self-Stimulatory Behavior',
+    definition: 'Repetitive motor movements that serve no apparent functional purpose. Examples include hand-flapping, rocking, spinning objects, finger-flicking near eyes, or making repetitive vocalizations. Behavior occurs for at least 5 consecutive seconds.',
+    measurement: 'frequency', defaultOn: false, canRemove: true, alwaysLast: false
+  },
+  {
+    id: 'tantrum', name: 'Tantrum',
+    definition: 'Student engages in a tantrum episode involving crying, screaming, dropping to the floor, or any combination of these behaviors in response to a non-preferred demand or transition. Duration is recorded in minutes from onset to offset.',
+    measurement: 'duration', defaultOn: false, canRemove: true, alwaysLast: false
+  },
+  // ── Crisis (always last, always checked) ────────────────────────
+  {
+    id: 'crisis', name: 'Crisis',
+    definition: 'When the student engages in multiple problem behaviors either simultaneously or in quick succession over a short period of time. These multiple behaviors can include physical aggression, property destruction, and self-injurious behaviors. Whenever the student starts to engage in this we collect duration in minutes for the episode.',
+    measurement: 'duration', defaultOn: true, canRemove: false, alwaysLast: true
   }
 ];
 
-const SCHEDULES = {
-  elementary: { label: 'Elementary',   start: 8,  end: 15 },
-  middle:     { label: 'Middle School', start: 9,  end: 16 },
-  high:       { label: 'High School',  start: 7,  end: 15 },
-  allday:     { label: 'All Day',      start: 8,  end: 16 },
-  custom:     { label: 'Custom',       start: null, end: null }
+// ===================================================================
+//  STATE
+// ===================================================================
+var sheetType        = 'behavior';
+var selectedSchedule = null;
+var qrDataURL        = null;
+var customCounter    = 0;
+var SCHEDULES = {
+  elementary: ['8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM'],
+  middle:     ['9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM'],
+  high:       ['7:00 AM','8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM'],
+  allday:     ['8:00 AM','9:00 AM','10:00 AM','11:00 AM','12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM']
 };
 
-// ═══════════════════════════════════════════════════════════════
-//  STATE
-// ═══════════════════════════════════════════════════════════════
-let sheetType = 'behavior';
-let selectedSchedule = null;
-let behaviorCards = [];
-let nextBehaviorId = 1;
-let qrDataURL = null;
-
-// ═══════════════════════════════════════════════════════════════
-//  SHEET TYPE
-// ═══════════════════════════════════════════════════════════════
-function switchSheetType(type) {
+// ===================================================================
+//  SHEET TYPE TOGGLE
+// ===================================================================
+function switchType(type) {
   sheetType = type;
   document.getElementById('btn-behavior').classList.toggle('active', type === 'behavior');
   document.getElementById('btn-abc').classList.toggle('active', type === 'abc');
-  document.getElementById('step-schedule').style.display   = type === 'behavior' ? '' : 'none';
-  document.getElementById('step-behaviors').style.display  = type === 'behavior' ? '' : 'none';
-  document.getElementById('step-abc-opts').style.display   = type === 'abc'      ? '' : 'none';
+  document.getElementById('section-schedule').style.display  = type === 'behavior' ? '' : 'none';
+  document.getElementById('section-behaviors').style.display = type === 'behavior' ? '' : 'none';
+  document.getElementById('section-abc').style.display       = type === 'abc'      ? '' : 'none';
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ===================================================================
+//  INIT — render behavior list
+// ===================================================================
+function init() {
+  var list = document.getElementById('behavior-list');
+  LIBRARY.forEach(function(b) { list.appendChild(makeBehaviorItem(b)); });
+}
+
+function makeBehaviorItem(beh) {
+  var div = document.createElement('div');
+  div.className = 'behavior-item' + (beh.alwaysLast ? ' crisis-item' : '');
+  div.id = 'beh-item-' + beh.id;
+
+  var freqActive = beh.measurement === 'frequency' ? ' active' : '';
+  var durActive  = beh.measurement === 'duration'  ? ' active' : '';
+  var measLabel  = beh.measurement === 'frequency' ? 'Frequency' : 'Duration';
+  var measClass  = beh.measurement === 'frequency' ? 'badge-freq' : 'badge-dur';
+  var checkAttr  = (beh.alwaysLast || beh.defaultOn) ? 'checked' : '';
+  if (beh.alwaysLast) checkAttr += ' disabled';
+
+  var fixedBadge = beh.alwaysLast
+    ? '<span class="badge badge-fixed">Always Last</span>'
+    : (!beh.canRemove ? '<span class="badge badge-fixed">Standard</span>' : '');
+
+  var removeBtn = beh.canRemove
+    ? '<button class="remove-beh-btn" onclick="removeBehavior(\'' + beh.id + '\')">Remove this behavior</button>'
+    : '';
+
+  // All behaviors (including crisis) are expandable to edit their definition
+  var arrowHtml   = '<span class="expand-arrow" id="arrow-' + beh.id + '">\u25BC</span>';
+  var headerClick = 'onclick="toggleBody(\'' + beh.id + '\')"';
+
+  div.innerHTML = [
+    '<div class="behavior-header" ' + headerClick + '>',
+      '<input type="checkbox" class="beh-check" id="chk-' + beh.id + '" ' + checkAttr + ' onclick="event.stopPropagation()">',
+      '<span class="beh-name-display" id="name-disp-' + beh.id + '">' + esc(beh.name) + '</span>',
+      '<span class="badge ' + measClass + '" id="badge-' + beh.id + '">' + measLabel + '</span>',
+      fixedBadge,
+      arrowHtml,
+    '</div>',
+    '<div class="behavior-body" id="body-' + beh.id + '">',
+      '<div class="form-group">',
+        '<label>Behavior Name</label>',
+        '<input type="text" id="beh-name-' + beh.id + '" value="' + esc(beh.name) + '"',
+        ' oninput="document.getElementById(\'name-disp-' + beh.id + '\').textContent=this.value||\'(no name)\'">',
+      '</div>',
+      '<div class="form-group">',
+        '<label>Definition</label>',
+        '<textarea id="beh-def-' + beh.id + '">' + esc(beh.definition) + '</textarea>',
+      '</div>',
+      '<div class="form-group">',
+        '<label>Measurement</label>',
+        '<div class="meas-toggle">',
+          '<button class="meas-btn' + freqActive + '" id="mfreq-' + beh.id + '"',
+          ' onclick="setMeas(\'' + beh.id + '\',\'frequency\')">Frequency / Tally</button>',
+          '<button class="meas-btn' + durActive + '" id="mdur-' + beh.id + '"',
+          ' onclick="setMeas(\'' + beh.id + '\',\'duration\')">Duration (minutes)</button>',
+        '</div>',
+      '</div>',
+      removeBtn,
+    '</div>'
+  ].join('');
+  return div;
+}
+
+function toggleBody(id) {
+  var body  = document.getElementById('body-'  + id);
+  var arrow = document.getElementById('arrow-' + id);
+  if (!body) return;
+  var isOpen = body.classList.toggle('open');
+  if (arrow) arrow.textContent = isOpen ? '\u25B2' : '\u25BC';
+}
+
+function setMeas(id, type) {
+  var fBtn  = document.getElementById('mfreq-' + id);
+  var dBtn  = document.getElementById('mdur-'  + id);
+  var badge = document.getElementById('badge-' + id);
+  if (fBtn)  fBtn.classList.toggle('active', type === 'frequency');
+  if (dBtn)  dBtn.classList.toggle('active', type === 'duration');
+  if (badge) {
+    badge.className   = 'badge ' + (type === 'frequency' ? 'badge-freq' : 'badge-dur');
+    badge.textContent = type === 'frequency' ? 'Frequency' : 'Duration';
+  }
+}
+
+function removeBehavior(id) {
+  var el = document.getElementById('beh-item-' + id);
+  if (el) el.remove();
+}
+
+// ===================================================================
+//  CUSTOM BEHAVIOR
+// ===================================================================
+function addCustomBehavior() {
+  customCounter++;
+  var id = 'custom' + customCounter;
+  var beh = {
+    id: id, name: '', definition: '',
+    measurement: 'frequency',
+    defaultOn: true, canRemove: true, alwaysLast: false
+  };
+  var item = makeBehaviorItem(beh);
+  item.querySelector('#beh-name-' + id).placeholder = 'Enter behavior name';
+  var crisis = document.getElementById('beh-item-crisis');
+  var list   = document.getElementById('behavior-list');
+  if (crisis) { list.insertBefore(item, crisis); } else { list.appendChild(item); }
+  toggleBody(id);
+  setTimeout(function() {
+    var ni = document.getElementById('beh-name-' + id);
+    if (ni) ni.focus();
+  }, 50);
+}
+
+// ===================================================================
 //  SCHEDULE
-// ═══════════════════════════════════════════════════════════════
-function selectSchedule(key) {
+// ===================================================================
+function selectSchedule(btn, key) {
+  document.querySelectorAll('.sched-btn').forEach(function(b) { b.classList.remove('active'); });
+  btn.classList.add('active');
   selectedSchedule = key;
-  document.querySelectorAll('.sched-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById('sched-' + key).classList.add('active');
-  document.getElementById('custom-times').style.display = key === 'custom' ? 'block' : 'none';
+  document.getElementById('custom-time-row').classList.toggle('visible', key === 'custom');
 }
 
 function getTimeSlots() {
   if (!selectedSchedule) return [];
-  if (selectedSchedule === 'custom') {
-    const allTimes = [
-      '6:00 AM','6:30 AM','7:00 AM','7:30 AM','8:00 AM','8:30 AM',
-      '9:00 AM','9:30 AM','10:00 AM','10:30 AM','11:00 AM','11:30 AM',
-      '12:00 PM','12:30 PM','1:00 PM','1:30 PM','2:00 PM','2:30 PM',
-      '3:00 PM','3:30 PM','4:00 PM','4:30 PM','5:00 PM','6:00 PM'
-    ];
-    const startVal = document.getElementById('custom-start').value;
-    const endVal   = document.getElementById('custom-end').value;
-    const si = allTimes.indexOf(startVal);
-    const ei = allTimes.indexOf(endVal);
-    if (si < 0 || ei <= si) return [];
-    return allTimes.slice(si, ei).filter(t => t.endsWith(':00 AM') || t.endsWith(':00 PM'));
-  }
-  const { start, end } = SCHEDULES[selectedSchedule];
-  const slots = [];
-  for (let h = start; h < end; h++) {
-    slots.push(formatHour(h));
-  }
-  return slots;
+  if (selectedSchedule !== 'custom') return SCHEDULES[selectedSchedule];
+  var ALL = [
+    '6:00 AM','7:00 AM','8:00 AM','9:00 AM','10:00 AM','11:00 AM',
+    '12:00 PM','1:00 PM','2:00 PM','3:00 PM','4:00 PM','5:00 PM','6:00 PM'
+  ];
+  var s = document.getElementById('custom-start').value;
+  var e = document.getElementById('custom-end').value;
+  var si = ALL.indexOf(s), ei = ALL.indexOf(e);
+  if (si < 0 || ei < 0 || ei <= si) return [];
+  return ALL.slice(si, ei + 1);
 }
 
-function formatHour(h) {
-  if (h === 0)  return '12:00 AM';
-  if (h === 12) return '12:00 PM';
-  if (h < 12)   return h + ':00 AM';
-  return (h - 12) + ':00 PM';
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  BEHAVIOR CARD MANAGEMENT
-// ═══════════════════════════════════════════════════════════════
-function addBehavior() {
-  const id = nextBehaviorId++;
-  behaviorCards.push({ id });
-  renderBehaviorCard(id);
-}
-
-function renderBehaviorCard(id) {
-  const list = document.getElementById('behaviors-list');
-  const num  = behaviorCards.findIndex(c => c.id === id) + 1;
-
-  const libraryOptions = BEHAVIOR_LIBRARY.map(b =>
-    `<option value="${b.key}">${b.name}</option>`
-  ).join('');
-
-  const div = document.createElement('div');
-  div.className = 'behavior-card';
-  div.id = 'bcard-' + id;
-  div.innerHTML = `
-    <div class="card-header">
-      <div class="card-title">
-        <span class="card-num">${num}</span>
-        <span id="btitle-${id}">Custom Behavior ${num}</span>
-      </div>
-      <button class="remove-btn" onclick="removeBehavior(${id})" title="Remove">×</button>
-    </div>
-    <div class="form-group">
-      <label>Select from Library (optional)</label>
-      <select class="library-select" onchange="selectFromLibrary(${id}, this.value)">
-        <option value="">— Type manually or select from library —</option>
-        ${libraryOptions}
-      </select>
-    </div>
-    <div class="form-group">
-      <label>Behavior Name (Column Header)</label>
-      <input type="text" id="bname-${id}" placeholder="e.g. Physical Aggression"
-             oninput="document.getElementById('btitle-${id}').textContent=this.value||'Custom Behavior ${num}'">
-    </div>
-    <div class="form-group">
-      <label>Definition (for the right-side panel)</label>
-      <textarea id="bdef-${id}" placeholder="Enter the behavior definition…"></textarea>
-    </div>
-    <div class="form-group">
-      <label>Data Collection Method</label>
-      <div class="meas-toggle">
-        <button class="meas-btn freq-active" id="mfreq-${id}" onclick="setMeasurement(${id},'frequency')">
-          Frequency / Tally
-        </button>
-        <button class="meas-btn" id="mdur-${id}" onclick="setMeasurement(${id},'duration')">
-          Duration (Minutes)
-        </button>
-      </div>
-      <input type="hidden" id="mmeas-${id}" value="frequency">
-    </div>
-  `;
-  list.appendChild(div);
-}
-
-function removeBehavior(id) {
-  const idx = behaviorCards.findIndex(c => c.id === id);
-  if (idx !== -1) behaviorCards.splice(idx, 1);
-  const el = document.getElementById('bcard-' + id);
-  if (el) el.remove();
-  renumberCards();
-}
-
-function renumberCards() {
-  behaviorCards.forEach((c, i) => {
-    const num = i + 1;
-    const numEl = document.querySelector(`#bcard-${c.id} .card-num`);
-    if (numEl) numEl.textContent = num;
-    const titleEl = document.getElementById('btitle-' + c.id);
-    const nameVal = document.getElementById('bname-' + c.id)?.value;
-    if (titleEl && !nameVal) titleEl.textContent = 'Custom Behavior ' + num;
-  });
-}
-
-function selectFromLibrary(id, key) {
-  if (!key) return;
-  const entry = BEHAVIOR_LIBRARY.find(b => b.key === key);
-  if (!entry) return;
-  const nameEl  = document.getElementById('bname-' + id);
-  const defEl   = document.getElementById('bdef-'  + id);
-  const titleEl = document.getElementById('btitle-' + id);
-  if (nameEl) { nameEl.value = entry.name; }
-  if (defEl)  { defEl.value  = entry.definition; }
-  if (titleEl) { titleEl.textContent = entry.name; }
-  setMeasurement(id, entry.measurement);
-}
-
-function setMeasurement(id, type) {
-  const freqBtn = document.getElementById('mfreq-' + id);
-  const durBtn  = document.getElementById('mdur-'  + id);
-  const hiddenInput = document.getElementById('mmeas-' + id);
-  if (freqBtn) { freqBtn.className = 'meas-btn' + (type === 'frequency' ? ' freq-active' : ''); }
-  if (durBtn)  { durBtn.className  = 'meas-btn' + (type === 'duration'  ? ' dur-active'  : ''); }
-  if (hiddenInput) { hiddenInput.value = type; }
-}
-
-// ═══════════════════════════════════════════════════════════════
+// ===================================================================
 //  QR CODE
-// ═══════════════════════════════════════════════════════════════
-function handleQRUpload(event) {
-  const file = event.target.files[0];
+// ===================================================================
+function handleQR(evt) {
+  var file = evt.target.files[0];
   if (!file) return;
-  const reader = new FileReader();
-  reader.onload = e => {
+  var r = new FileReader();
+  r.onload = function(e) {
     qrDataURL = e.target.result;
     document.getElementById('qr-preview-img').src = qrDataURL;
     document.getElementById('qr-preview-wrap').style.display = 'block';
   };
-  reader.readAsDataURL(file);
+  r.readAsDataURL(file);
 }
 
 function removeQR() {
   qrDataURL = null;
   document.getElementById('qr-preview-wrap').style.display = 'none';
-  document.getElementById('qr-file-input').value = '';
+  document.getElementById('qr-input').value = '';
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  COLLECT FORM DATA
-// ═══════════════════════════════════════════════════════════════
-function collectFormData() {
-  let name     = document.getElementById('student-name').value.trim();
-  let initials = document.getElementById('student-initials').value.trim().toUpperCase();
-  const dateVal = document.getElementById('sheet-date').value;
-
-  if (!initials && name) {
-    initials = name.split(/\s+/).filter(Boolean).map(w => w[0].toUpperCase()).join('');
+// ===================================================================
+//  COLLECT BEHAVIOR SHEET DATA
+// ===================================================================
+function collectData() {
+  var initials = document.getElementById('student-initials').value.trim();
+  var dateVal  = document.getElementById('sheet-date').value;
+  var dateStr  = '';
+  if (dateVal) {
+    dateStr = new Date(dateVal + 'T12:00:00').toLocaleDateString('en-US',
+      { month: '2-digit', day: '2-digit', year: 'numeric' });
   }
-  if (!initials) initials = '___';
-
-  const dateStr = dateVal
-    ? new Date(dateVal + 'T12:00:00').toLocaleDateString('en-US', { month:'2-digit', day:'2-digit', year:'numeric' })
-    : '';
-
-  // Behaviors (only for behavior sheet)
-  const behaviors = [];
-  behaviorCards.forEach(c => {
-    const bname = document.getElementById('bname-' + c.id)?.value.trim();
-    const bdef  = document.getElementById('bdef-'  + c.id)?.value.trim();
-    const bmeas = document.getElementById('mmeas-' + c.id)?.value || 'frequency';
-    if (bname) {
-      behaviors.push({ name: bname, definition: bdef || '', measurement: bmeas });
-    }
+  var timeSlots = getTimeSlots();
+  var behaviors = [];
+  document.querySelectorAll('#behavior-list .behavior-item').forEach(function(item) {
+    var m = item.id.match(/^beh-item-(.+)$/);
+    if (!m) return;
+    var id  = m[1];
+    var chk = document.getElementById('chk-' + id);
+    if (!chk || !chk.checked) return;
+    var nameEl = document.getElementById('beh-name-' + id);
+    var name   = nameEl ? nameEl.value.trim() : '';
+    if (!name) return;
+    var defEl = document.getElementById('beh-def-' + id);
+    var def   = defEl ? defEl.value.trim() : '';
+    var freq  = document.getElementById('mfreq-' + id);
+    var meas  = (freq && freq.classList.contains('active')) ? 'frequency' : 'duration';
+    behaviors.push({ name: name, definition: def, measurement: meas });
   });
-
-  // Crisis always last
-  const crisisDef = document.getElementById('crisis-definition').value.trim();
-  behaviors.push({
-    name: 'Crisis',
-    definition: crisisDef,
-    measurement: 'duration'
-  });
-
-  const timeSlots = sheetType === 'behavior' ? getTimeSlots() : [];
-
-  return {
-    sheetType,
-    studentName: name || initials,
-    studentInitials: initials,
-    dateStr,
-    behaviors,
-    timeSlots,
-    abcRows: parseInt(document.getElementById('abc-rows')?.value || '18', 10)
-  };
+  return { initials: initials, dateStr: dateStr, timeSlots: timeSlots, behaviors: behaviors };
 }
 
-// ═══════════════════════════════════════════════════════════════
+// ===================================================================
 //  VALIDATE
-// ═══════════════════════════════════════════════════════════════
-function validate(data) {
-  const errEl = document.getElementById('error-msg');
-  errEl.classList.remove('visible');
-
-  const showErr = msg => {
-    errEl.textContent = msg;
-    errEl.classList.add('visible');
-    errEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+// ===================================================================
+function validate(d) {
+  if (!d.initials) {
+    alert('Please enter the student initials.');
+    document.getElementById('student-initials').focus();
     return false;
-  };
-
-  if (!data.studentInitials || data.studentInitials === '___') {
-    return showErr('Please enter the student name or initials.');
   }
-  if (data.sheetType === 'behavior') {
-    if (!selectedSchedule) {
-      return showErr('Please select a school schedule.');
-    }
-    if (data.timeSlots.length === 0) {
-      return showErr('No time slots found. Check your schedule or custom time range.');
-    }
-    if (data.behaviors.length < 2) {
-      return showErr('Please add at least one behavior column (besides Crisis).');
-    }
+  if (!selectedSchedule) {
+    alert('Please select a schedule.');
+    return false;
+  }
+  if (!d.timeSlots.length) {
+    alert('No time slots found. Check your custom time range.');
+    return false;
+  }
+  if (d.behaviors.length < 2) {
+    alert('Please include at least one behavior besides Crisis.');
+    return false;
   }
   return true;
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  GENERATE
-// ═══════════════════════════════════════════════════════════════
-function generateDatasheet() {
-  const data = collectFormData();
-  if (!validate(data)) return;
+// ===================================================================
+//  BUILD BEHAVIOR DATASHEET HTML
+// ===================================================================
+function esc(s) {
+  return (s || '')
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
 
-  const html = data.sheetType === 'abc'
-    ? buildABCSheetHTML(data)
-    : buildBehaviorSheetHTML(data);
+function buildDatasheet(d) {
+  var initials  = d.initials;
+  var dateStr   = d.dateStr;
+  var timeSlots = d.timeSlots;
+  var behaviors = d.behaviors;
 
-  document.getElementById('generated-datasheet').innerHTML = html;
-  document.getElementById('creator-panel').style.display   = 'none';
-  document.getElementById('preview-panel').classList.add('visible');
+  // Separate crisis from frequency and duration behaviors.
+  // Duration (non-crisis) behaviors sit adjacent to Crisis so the
+  // Duration header in Row 2 spans all of them together.
+  var crisis   = null;
+  var freqBehs = [];
+  var durBehs  = [];
+  behaviors.forEach(function(b) {
+    if (b.name.toLowerCase().indexOf('crisis') >= 0) { crisis = b; }
+    else if (b.measurement === 'duration') { durBehs.push(b); }
+    else { freqBehs.push(b); }
+  });
+
+  // Column order: frequency cols | duration cols | Crisis
+  var regular = freqBehs.concat(durBehs);
+  var nReg    = regular.length;
+  var nFreq   = freqBehs.length;
+  var nDur    = durBehs.length;
+  var nTotal  = 1 + nReg + 1; // time + regular + crisis
+
+  // ── Row 1: Date | (middle span) | Student | Initials ──
+  var dateValueCell = nReg > 1
+    ? '<td class="h1-middle" colspan="' + (nReg - 1) + '" style="font-size:10.5px;padding:3px 6px;">'
+      + (dateStr ? esc(dateStr) : '') + '</td>'
+    : '';
+  var row1 = '<tr>'
+    + '<td class="h1-date">Date:</td>'
+    + dateValueCell
+    + '<td class="h1-student">Student</td>'
+    + '<td class="h1-initials">' + esc(initials) + '</td>'
+    + '</tr>';
+
+  // ── Row 2: Frequency Measure | Duration ──
+  // Frequency spans: Time col + all frequency behavior cols
+  // Duration spans:  all duration behavior cols + Crisis col
+  var freqColspan = 1 + nFreq;
+  var durColspan  = nDur + 1;
+  var row2 = '<tr>'
+    + '<td colspan="' + freqColspan + '" class="h2-freq">'
+    + '<u><strong>Frequency Measure</strong></u>: Record data with Tallies of Occurrences of behaviors.&nbsp;(ex: III&nbsp;=&nbsp;3 tallies)'
+    + '</td>'
+    + '<td colspan="' + durColspan + '" class="h2-dur">'
+    + '<u><strong>Duration</strong></u>: Record minutes the episode lasted.&nbsp;(Ex:&nbsp;(5)&nbsp;=&nbsp;5&nbsp;min&nbsp;/&nbsp;(3)(4)&nbsp;=&nbsp;7&nbsp;min)'
+    + '</td>'
+    + '</tr>';
+
+  // ── Row 3: Column headers ──
+  var thCells = '<th class="h3-th" style="width:60px;">Time</th>';
+  regular.forEach(function(b) { thCells += '<th class="h3-th">' + esc(b.name) + '</th>'; });
+  thCells += '<th class="h3-th" style="width:105px;">Crisis</th>';
+  var row3 = '<tr>' + thCells + '</tr>';
+
+  // ── Time rows ──
+  var timeRows = '';
+  timeSlots.forEach(function(t) {
+    var cells = '<td class="time-cell">' + t + '</td>';
+    regular.forEach(function() { cells += '<td></td>'; });
+    cells += '<td></td>';
+    timeRows += '<tr class="time-row">' + cells + '</tr>';
+  });
+
+  // ── Total row ──
+  var totalCells = '<td class="time-cell" style="font-weight:700;">Total</td>';
+  regular.forEach(function() { totalCells += '<td></td>'; });
+  totalCells += '<td></td>';
+  var totalRow = '<tr class="total-row">' + totalCells + '</tr>';
+
+  // ── Notes row ──
+  var notesRow = '<tr class="notes-row">'
+    + '<td colspan="' + nTotal + '">'
+    + '<strong>Misc Notes:</strong>'
+    + '<div class="notes-lines"></div>'
+    + '</td></tr>';
+
+  // ── Colgroup ──
+  var colgroup = '<colgroup><col style="width:60px;">'
+    + regular.map(function() { return '<col>'; }).join('')
+    + '<col style="width:105px;"></colgroup>';
+
+  // ── Definitions panel (listed in column order) ──
+  var allInOrder = freqBehs.concat(durBehs).concat(crisis ? [crisis] : []);
+  var defs = '';
+  allInOrder.forEach(function(b) {
+    var label = b.measurement === 'duration' ? ' (Duration)' : '';
+    defs += '<div class="def-entry">'
+      + '<span class="def-name">' + esc(b.name) + label + ':</span>'
+      + esc(b.definition)
+      + '</div>';
+  });
+
+  // ── QR box ──
+  var qrContent = qrDataURL ? '<img src="' + qrDataURL + '" alt="QR">' : 'QR Code';
+
+  return '<div class="ds-body">'
+    + '<div class="ds-main">'
+    + '<table class="ds-table">'
+    + colgroup
+    + '<tbody>'
+    + row1 + row2 + row3 + timeRows + totalRow + notesRow
+    + '</tbody></table>'
+    + '</div>'
+    + '<div class="ds-defs">' + defs + '</div>'
+    + '</div>'
+    + '<div class="ds-footer">'
+    + '<div class="qr-box">' + qrContent + '</div>'
+    + '<div class="hsb-label">HSB Datasheet</div>'
+    + '</div>';
+}
+
+// ===================================================================
+//  BUILD ABC DATA COLLECTION SHEET
+// ===================================================================
+function buildABCSheet() {
+  var initials = document.getElementById('student-initials').value.trim() || '___';
+  var dateVal  = document.getElementById('sheet-date').value;
+  var dateStr  = '';
+  if (dateVal) {
+    dateStr = new Date(dateVal + 'T12:00:00').toLocaleDateString('en-US',
+      { month: '2-digit', day: '2-digit', year: 'numeric' });
+  }
+  var nRows = parseInt(document.getElementById('abc-rows').value, 10) || 18;
+  if (nRows < 1) nRows = 1;
+
+  var headerRow = '<div class="abc-header-row">'
+    + '<div class="abc-header-title">ABC Data Collection Sheet</div>'
+    + '<div class="abc-header-student">' + esc(initials) + '</div>'
+    + '<div class="abc-header-date">' + (dateStr ? 'Date: ' + esc(dateStr) : 'Date: ___________') + '</div>'
+    + '</div>';
+
+  var colgroup = '<colgroup>'
+    + '<col style="width:0.7in;">'
+    + '<col style="width:0.65in;">'
+    + '<col style="width:1.0in;">'
+    + '<col><col><col>'
+    + '</colgroup>';
+
+  var thead = '<thead><tr>'
+    + '<th>Date</th>'
+    + '<th>Time</th>'
+    + '<th>Location</th>'
+    + '<th>Antecedent<span class="abc-sub">What happened before?</span></th>'
+    + '<th>Behavior<span class="abc-sub">What did the student do?</span></th>'
+    + '<th>Consequence<span class="abc-sub">What happened after?</span></th>'
+    + '</tr></thead>';
+
+  var rows = '';
+  for (var i = 0; i < nRows; i++) {
+    rows += '<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
+  }
+
+  var qrContent = qrDataURL ? '<img src="' + qrDataURL + '" alt="QR">' : 'QR Code';
+
+  return headerRow
+    + '<table class="abc-table">' + colgroup + thead + '<tbody>' + rows + '</tbody></table>'
+    + '<div class="ds-footer" style="margin-top:5px;">'
+    + '<div class="qr-box">' + qrContent + '</div>'
+    + '<div class="hsb-label">HSB Datasheet</div>'
+    + '</div>';
+}
+
+// ===================================================================
+//  GENERATE / NAVIGATE
+// ===================================================================
+function generate() {
+  if (sheetType === 'abc') {
+    var initials = document.getElementById('student-initials').value.trim();
+    if (!initials) {
+      alert('Please enter the student initials.');
+      document.getElementById('student-initials').focus();
+      return;
+    }
+    document.getElementById('datasheet').innerHTML = buildABCSheet();
+  } else {
+    var data = collectData();
+    if (!validate(data)) return;
+    document.getElementById('datasheet').innerHTML = buildDatasheet(data);
+  }
+  document.getElementById('creator').style.display = 'none';
+  document.getElementById('preview-section').style.display = 'block';
   window.scrollTo(0, 0);
 }
 
-function showCreator() {
-  document.getElementById('preview-panel').classList.remove('visible');
-  document.getElementById('creator-panel').style.display = '';
+function goBack() {
+  document.getElementById('preview-section').style.display = 'none';
+  document.getElementById('creator').style.display = 'block';
   window.scrollTo(0, 0);
 }
 
-// ═══════════════════════════════════════════════════════════════
-//  BUILD: BEHAVIOR DATASHEET
-// ═══════════════════════════════════════════════════════════════
-function buildBehaviorSheetHTML(data) {
-  const { studentInitials, dateStr, behaviors, timeSlots } = data;
-
-  // Separate regular behaviors from Crisis (Crisis always last)
-  const regular = behaviors.filter(b => b.name !== 'Crisis');
-  const crisis  = behaviors.find(b => b.name === 'Crisis');
-  const allBehaviors = crisis ? [...regular, crisis] : regular;
-  const totalCols = 1 + regular.length + 1; // time + regular + crisis
-
-  // ── Header Row 1: Date / Student / Initials ──
-  const dateDisplay = dateStr
-    ? `<strong>${dateStr}</strong>`
-    : '<span class="date-field"></span>';
-
-  const hdr1 = `
-    <tr class="ds-hdr1">
-      <td style="width:58px"><span class="date-label">Date</span>${dateDisplay}</td>
-      <td colspan="${regular.length > 1 ? regular.length - 1 : 1}" style="text-align:center"></td>
-      <td style="text-align:center"><span class="student-label">Student</span></td>
-      <td colspan="2" class="student-initials">${esc(studentInitials)}</td>
-    </tr>`;
-
-  // ── Header Row 2: Frequency / Duration descriptor ──
-  const freqCount = regular.length; // time col + regular behavior cols
-  const hdr2 = `
-    <tr class="ds-hdr2">
-      <td colspan="${1 + freqCount}" style="text-align:left">
-        <span class="freq-label">Frequency Measure</span>: Record data with Tallies of Occurrences of behaviors.&nbsp;(ex: III&nbsp;=&nbsp;3 tallies)
-      </td>
-      <td style="text-align:left">
-        <span class="dur-label">Duration</span>: Record minutes the episode lasted.&nbsp;(Ex:&nbsp;(5)&nbsp;=&nbsp;5&nbsp;min&nbsp;/&nbsp;(3)(4)&nbsp;=&nbsp;7&nbsp;min)
-      </td>
-    </tr>`;
-
-  // ── Header Row 3: Column labels ──
-  const hdr3cols = regular.map(b => `<th>${esc(b.name)}</th>`).join('');
-  const hdr3 = `
-    <tr class="ds-hdr3">
-      <th style="width:58px">Time</th>
-      ${hdr3cols}
-      <th style="width:95px">Crisis</th>
-    </tr>`;
-
-  // ── Time Rows ──
-  const timeRows = timeSlots.map(t => {
-    const cells = regular.map(() => '<td></td>').join('');
-    return `<tr class="ds-time-row"><td class="time-cell">${t}</td>${cells}<td></td></tr>`;
-  }).join('');
-
-  // ── Total Row ──
-  const totalCells = regular.map(() => '<td></td>').join('');
-  const totalRow = `
-    <tr class="ds-total-row">
-      <td class="time-cell" style="font-weight:700">Total</td>
-      ${totalCells}<td></td>
-    </tr>`;
-
-  // ── Notes Row ──
-  const notesRow = `
-    <tr class="ds-notes-row">
-      <td colspan="${totalCols}"><span class="notes-label">Misc Notes:</span></td>
-    </tr>`;
-
-  // ── Definitions Panel ──
-  const defItems = allBehaviors.map(b => `
-    <div class="def-item">
-      <span class="def-item-name">${esc(b.name)}${b.measurement === 'duration' ? ' (Duration)' : ''}:</span>
-      <span class="def-item-text">${esc(b.definition)}</span>
-    </div>`).join('');
-
-  // ── QR & Footer ──
-  const qrContent = qrDataURL
-    ? `<img src="${qrDataURL}" alt="QR Code">`
-    : 'QR Code';
-
-  return `
-    <div class="ds-wrapper">
-      <div class="ds-main">
-        <table class="ds-table">
-          <colgroup>
-            <col style="width:58px">
-            ${regular.map(() => '<col>').join('')}
-            <col style="width:95px">
-          </colgroup>
-          <tbody>
-            ${hdr1}
-            ${hdr2}
-            ${hdr3}
-            ${timeRows}
-            ${totalRow}
-            ${notesRow}
-          </tbody>
-        </table>
-      </div>
-      <div class="ds-definitions">${defItems}</div>
-    </div>
-    <div class="ds-footer">
-      <div class="qr-box">${qrContent}</div>
-      <div class="hsb-label">HSB Datasheet</div>
-    </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  BUILD: ABC DATA COLLECTION SHEET
-// ═══════════════════════════════════════════════════════════════
-function buildABCSheetHTML(data) {
-  const { studentInitials, studentName, dateStr, abcRows } = data;
-  const displayName = studentName || studentInitials;
-
-  const dateDisplay = dateStr
-    ? `<span class="abc-hdr-date">Date: ${dateStr}</span>`
-    : '<span class="abc-hdr-date">Date: _______________</span>';
-
-  const rows = Array.from({ length: abcRows }, () => `
-    <tr>
-      <td></td><td></td><td></td><td></td><td></td><td></td>
-    </tr>`).join('');
-
-  const qrContent = qrDataURL
-    ? `<img src="${qrDataURL}" alt="QR Code">`
-    : 'QR Code';
-
-  return `
-    <div class="abc-wrapper">
-      <div class="abc-hdr-row">
-        <div class="abc-hdr-title">ABC Data Collection Sheet</div>
-        <div class="abc-hdr-student">${esc(displayName)}</div>
-        ${dateDisplay}
-      </div>
-      <table class="abc-table">
-        <colgroup>
-          <col style="width:0.75in">
-          <col style="width:0.65in">
-          <col style="width:1.0in">
-          <col>
-          <col>
-          <col>
-        </colgroup>
-        <thead>
-          <tr>
-            <th>Date</th>
-            <th>Time</th>
-            <th>Location</th>
-            <th>Antecedent<br><span class="abc-sub">What happened before?</span></th>
-            <th>Behavior<br><span class="abc-sub">What did the student do?</span></th>
-            <th>Consequence<br><span class="abc-sub">What happened after?</span></th>
-          </tr>
-        </thead>
-        <tbody>${rows}</tbody>
-      </table>
-      <div class="ds-footer" style="margin-top:5px;">
-        <div class="qr-box">${qrContent}</div>
-        <div class="hsb-label">HSB Datasheet</div>
-      </div>
-    </div>`;
-}
-
-// ═══════════════════════════════════════════════════════════════
-//  UTILITIES
-// ═══════════════════════════════════════════════════════════════
-function esc(str) {
-  if (!str) return '';
-  return str
-    .replace(/&/g, '&amp;')
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
-    .replace(/"/g, '&quot;');
-}
+// ===================================================================
+//  BOOT
+// ===================================================================
+init();
 </script>
 </body>
 </html>
