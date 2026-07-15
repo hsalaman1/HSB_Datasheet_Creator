@@ -153,6 +153,7 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 }
 .badge-freq  { background: #eaf5ea; color: #2a6a2a; border: 1px solid #b5d8b5; }
 .badge-dur   { background: #eaecf8; color: #2a3a8a; border: 1px solid #b5bfe8; }
+.badge-pct   { background: #f7efe1; color: #8a5a1e; border: 1px solid #e3cfa8; }
 .badge-fixed { background: #f0f0f0; color: #555; border: 1px solid #ccc; font-size: 9px; }
 .expand-arrow { font-size: 9px; color: #aaa; flex-shrink: 0; }
 .behavior-body {
@@ -325,6 +326,7 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 .h1-student { font-weight: 700; font-size: 10.5px; text-align: center; }
 .h1-initials{ font-weight: 700; font-size: 16px; text-align: center; letter-spacing: 2px; }
 .h2-freq { font-size: 8.5px; padding: 3px 5px; }
+.h2-pct  { font-size: 8.5px; padding: 3px 5px; }
 .h2-dur  { font-size: 8.5px; padding: 3px 5px; }
 .h3-th {
   font-weight: 700;
@@ -342,15 +344,7 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
   vertical-align: top;
   padding: 5px 6px;
   height: 161px;
-}
-.notes-lines {
-  margin-top: 5px;
-  height: 137px;
-  background-image: repeating-linear-gradient(
-    to bottom,
-    transparent, transparent 16px,
-    #d0d0d0 16px, #d0d0d0 17px
-  );
+  border: none; /* open space, no box; Total row's bottom border is the only seam */
 }
 .ds-defs {
   width: 192px;
@@ -712,10 +706,13 @@ function makeBehaviorItem(beh) {
   div.className = 'behavior-item' + (beh.alwaysLast ? ' crisis-item' : '');
   div.id = 'beh-item-' + beh.id;
 
-  var freqActive = beh.measurement === 'frequency' ? ' active' : '';
-  var durActive  = beh.measurement === 'duration'  ? ' active' : '';
-  var measLabel  = beh.measurement === 'frequency' ? 'Frequency' : 'Duration';
-  var measClass  = beh.measurement === 'frequency' ? 'badge-freq' : 'badge-dur';
+  var freqActive = beh.measurement === 'frequency'  ? ' active' : '';
+  var durActive  = beh.measurement === 'duration'   ? ' active' : '';
+  var pctActive  = beh.measurement === 'percentage' ? ' active' : '';
+  var measLabel  = beh.measurement === 'duration' ? 'Duration'
+                 : (beh.measurement === 'percentage' ? 'Percentage' : 'Frequency');
+  var measClass  = beh.measurement === 'duration' ? 'badge-dur'
+                 : (beh.measurement === 'percentage' ? 'badge-pct' : 'badge-freq');
   var checkAttr  = (beh.alwaysLast || beh.defaultOn) ? 'checked' : '';
   // Crisis is checked by default but may now be unchecked to omit it from the sheet.
 
@@ -756,6 +753,8 @@ function makeBehaviorItem(beh) {
           ' onclick="setMeas(\'' + beh.id + '\',\'frequency\')">Frequency / Tally</button>',
           '<button class="meas-btn' + durActive + '" id="mdur-' + beh.id + '"',
           ' onclick="setMeas(\'' + beh.id + '\',\'duration\')">Duration (minutes)</button>',
+          '<button class="meas-btn' + pctActive + '" id="mpct-' + beh.id + '"',
+          ' onclick="setMeas(\'' + beh.id + '\',\'percentage\')">Percentage (+/&minus;)</button>',
         '</div>',
       '</div>',
       removeBtn,
@@ -775,12 +774,18 @@ function toggleBody(id) {
 function setMeas(id, type) {
   var fBtn  = document.getElementById('mfreq-' + id);
   var dBtn  = document.getElementById('mdur-'  + id);
+  var pBtn  = document.getElementById('mpct-'  + id);
   var badge = document.getElementById('badge-' + id);
   if (fBtn)  fBtn.classList.toggle('active', type === 'frequency');
   if (dBtn)  dBtn.classList.toggle('active', type === 'duration');
+  if (pBtn)  pBtn.classList.toggle('active', type === 'percentage');
   if (badge) {
-    badge.className   = 'badge ' + (type === 'frequency' ? 'badge-freq' : 'badge-dur');
-    badge.textContent = type === 'frequency' ? 'Frequency' : 'Duration';
+    var cls = type === 'duration' ? 'badge-dur'
+            : (type === 'percentage' ? 'badge-pct' : 'badge-freq');
+    var txt = type === 'duration' ? 'Duration'
+            : (type === 'percentage' ? 'Percentage' : 'Frequency');
+    badge.className   = 'badge ' + cls;
+    badge.textContent = txt;
   }
 }
 
@@ -881,8 +886,11 @@ function collectData() {
     if (!name) return;
     var defEl = document.getElementById('beh-def-' + id);
     var def   = defEl ? defEl.value.trim() : '';
-    var freq  = document.getElementById('mfreq-' + id);
-    var meas  = (freq && freq.classList.contains('active')) ? 'frequency' : 'duration';
+    var dBtn  = document.getElementById('mdur-' + id);
+    var pBtn  = document.getElementById('mpct-' + id);
+    var meas  = 'frequency';
+    if (dBtn && dBtn.classList.contains('active'))      meas = 'duration';
+    else if (pBtn && pBtn.classList.contains('active')) meas = 'percentage';
     behaviors.push({ name: name, definition: def, measurement: meas });
   });
   return { initials: initials, dateStr: dateStr, timeSlots: timeSlots, behaviors: behaviors };
@@ -935,18 +943,21 @@ function buildDatasheet(d) {
   // Duration header in Row 2 spans all of them together.
   var crisis   = null;
   var freqBehs = [];
+  var pctBehs  = [];
   var durBehs  = [];
   behaviors.forEach(function(b) {
     if (b.name.toLowerCase().indexOf('crisis') >= 0) { crisis = b; }
-    else if (b.measurement === 'duration') { durBehs.push(b); }
+    else if (b.measurement === 'duration')   { durBehs.push(b); }
+    else if (b.measurement === 'percentage') { pctBehs.push(b); }
     else { freqBehs.push(b); }
   });
 
-  // Column order: frequency cols | duration cols | Crisis
+  // Column order: frequency cols | percentage cols | duration cols | Crisis
   var hasCrisis = !!crisis;
-  var regular = freqBehs.concat(durBehs);
+  var regular = freqBehs.concat(pctBehs).concat(durBehs);
   var nReg    = regular.length;
   var nFreq   = freqBehs.length;
+  var nPct    = pctBehs.length;
   var nDur    = durBehs.length;
   var nTotal  = 1 + nReg + (hasCrisis ? 1 : 0); // time + regular (+ crisis if included)
 
@@ -967,11 +978,17 @@ function buildDatasheet(d) {
   // Frequency spans: Time col + all frequency behavior cols
   // Duration spans:  all duration behavior cols + Crisis col
   var freqColspan = 1 + nFreq;
+  var pctColspan  = nPct;
   var durColspan  = nDur + (hasCrisis ? 1 : 0);
   var row2 = '<tr>'
     + '<td colspan="' + freqColspan + '" class="h2-freq">'
     + '<u><strong>Frequency Measure</strong></u>: Record data with Tallies of Occurrences of behaviors.&nbsp;(ex: III&nbsp;=&nbsp;3 tallies)'
     + '</td>'
+    + (pctColspan > 0
+        ? '<td colspan="' + pctColspan + '" class="h2-pct">'
+          + '<u><strong>Percentage</strong></u>: Mark&nbsp;+&nbsp;(correct) or&nbsp;&minus;&nbsp;(incorrect); &#10003;/&#10007; also fine. Total&nbsp;=&nbsp;%&nbsp;correct.'
+          + '</td>'
+        : '')
     + (durColspan > 0
         ? '<td colspan="' + durColspan + '" class="h2-dur">'
           + '<u><strong>Duration</strong></u>: Record minutes the episode lasted.&nbsp;(Ex:&nbsp;(5)&nbsp;=&nbsp;5&nbsp;min&nbsp;/&nbsp;(3)(4)&nbsp;=&nbsp;7&nbsp;min)'
@@ -1003,8 +1020,7 @@ function buildDatasheet(d) {
   // ── Notes row ──
   var notesRow = '<tr class="notes-row">'
     + '<td colspan="' + nTotal + '">'
-    + '<strong>Misc Notes:</strong>'
-    + '<div class="notes-lines"></div>'
+    + '<strong>Misc</strong>'
     + '</td></tr>';
 
   // ── Colgroup ──
@@ -1014,10 +1030,11 @@ function buildDatasheet(d) {
     + '</colgroup>';
 
   // ── Definitions panel (listed in column order) ──
-  var allInOrder = freqBehs.concat(durBehs).concat(crisis ? [crisis] : []);
+  var allInOrder = freqBehs.concat(pctBehs).concat(durBehs).concat(crisis ? [crisis] : []);
   var defs = '';
   allInOrder.forEach(function(b) {
-    var label = b.measurement === 'duration' ? ' (Duration)' : '';
+    var label = b.measurement === 'duration' ? ' (Duration)'
+              : (b.measurement === 'percentage' ? ' (%)' : '');
     defs += '<div class="def-entry">'
       + '<span class="def-name">' + esc(b.name) + label + ':</span>'
       + esc(b.definition)
