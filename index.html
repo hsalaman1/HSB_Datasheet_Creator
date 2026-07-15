@@ -420,20 +420,21 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
    PRINT
 ===================================================================== */
 @media print {
-  * { visibility: hidden !important; }
-  #datasheet,
-  #datasheet * { visibility: visible !important; }
-  #datasheet {
-    position: fixed !important;
-    top: 0; left: 0;
-    width: 100% !important;
-    height: 100% !important;
-    padding: 0.35in !important;
-    box-shadow: none !important;
+  @page { size: 11in 8.5in; margin: 0.2in; }
+  /* Hide the editor and the preview toolbar; keep only the datasheet. */
+  #creator,
+  .preview-bar { display: none !important; }
+  .preview-bg {
+    background: #fff !important;
+    padding: 0 !important;
+    min-height: 0 !important;
+    display: block !important;
+    overflow: visible !important;
   }
-  @page {
-    size: 11in 8.5in;
-    margin: 0;
+  /* Print the datasheet at its true on-screen size so print matches preview. */
+  #datasheet {
+    box-shadow: none !important;
+    margin: 0 auto !important;
   }
 }
 </style>
@@ -716,7 +717,7 @@ function makeBehaviorItem(beh) {
   var measLabel  = beh.measurement === 'frequency' ? 'Frequency' : 'Duration';
   var measClass  = beh.measurement === 'frequency' ? 'badge-freq' : 'badge-dur';
   var checkAttr  = (beh.alwaysLast || beh.defaultOn) ? 'checked' : '';
-  if (beh.alwaysLast) checkAttr += ' disabled';
+  // Crisis is checked by default but may now be unchecked to omit it from the sheet.
 
   var fixedBadge = beh.alwaysLast
     ? '<span class="badge badge-fixed">Always Last</span>'
@@ -904,8 +905,11 @@ function validate(d) {
     alert('No time slots found. Check your custom time range.');
     return false;
   }
-  if (d.behaviors.length < 2) {
-    alert('Please include at least one behavior besides Crisis.');
+  var nonCrisis = d.behaviors.filter(function(b) {
+    return b.name.toLowerCase().indexOf('crisis') < 0;
+  }).length;
+  if (nonCrisis < 1) {
+    alert('Please include at least one behavior.');
     return false;
   }
   return true;
@@ -939,15 +943,17 @@ function buildDatasheet(d) {
   });
 
   // Column order: frequency cols | duration cols | Crisis
+  var hasCrisis = !!crisis;
   var regular = freqBehs.concat(durBehs);
   var nReg    = regular.length;
   var nFreq   = freqBehs.length;
   var nDur    = durBehs.length;
-  var nTotal  = 1 + nReg + 1; // time + regular + crisis
+  var nTotal  = 1 + nReg + (hasCrisis ? 1 : 0); // time + regular (+ crisis if included)
 
   // ── Row 1: Date | (middle span) | Student | Initials ──
-  var dateValueCell = nReg > 1
-    ? '<td class="h1-middle" colspan="' + (nReg - 1) + '" style="font-size:10.5px;padding:3px 6px;">'
+  var midSpan = nTotal - 3; // columns between "Date:" and "Student"
+  var dateValueCell = midSpan > 0
+    ? '<td class="h1-middle" colspan="' + midSpan + '" style="font-size:10.5px;padding:3px 6px;">'
       + (dateStr ? esc(dateStr) : '') + '</td>'
     : '';
   var row1 = '<tr>'
@@ -961,20 +967,22 @@ function buildDatasheet(d) {
   // Frequency spans: Time col + all frequency behavior cols
   // Duration spans:  all duration behavior cols + Crisis col
   var freqColspan = 1 + nFreq;
-  var durColspan  = nDur + 1;
+  var durColspan  = nDur + (hasCrisis ? 1 : 0);
   var row2 = '<tr>'
     + '<td colspan="' + freqColspan + '" class="h2-freq">'
     + '<u><strong>Frequency Measure</strong></u>: Record data with Tallies of Occurrences of behaviors.&nbsp;(ex: III&nbsp;=&nbsp;3 tallies)'
     + '</td>'
-    + '<td colspan="' + durColspan + '" class="h2-dur">'
-    + '<u><strong>Duration</strong></u>: Record minutes the episode lasted.&nbsp;(Ex:&nbsp;(5)&nbsp;=&nbsp;5&nbsp;min&nbsp;/&nbsp;(3)(4)&nbsp;=&nbsp;7&nbsp;min)'
-    + '</td>'
+    + (durColspan > 0
+        ? '<td colspan="' + durColspan + '" class="h2-dur">'
+          + '<u><strong>Duration</strong></u>: Record minutes the episode lasted.&nbsp;(Ex:&nbsp;(5)&nbsp;=&nbsp;5&nbsp;min&nbsp;/&nbsp;(3)(4)&nbsp;=&nbsp;7&nbsp;min)'
+          + '</td>'
+        : '')
     + '</tr>';
 
   // ── Row 3: Column headers ──
   var thCells = '<th class="h3-th" style="width:60px;">Time</th>';
   regular.forEach(function(b) { thCells += '<th class="h3-th">' + esc(b.name) + '</th>'; });
-  thCells += '<th class="h3-th" style="width:105px;">Crisis</th>';
+  if (hasCrisis) thCells += '<th class="h3-th" style="width:105px;">' + esc(crisis.name) + '</th>';
   var row3 = '<tr>' + thCells + '</tr>';
 
   // ── Time rows ──
@@ -982,14 +990,14 @@ function buildDatasheet(d) {
   timeSlots.forEach(function(t) {
     var cells = '<td class="time-cell">' + t + '</td>';
     regular.forEach(function() { cells += '<td></td>'; });
-    cells += '<td></td>';
+    if (hasCrisis) cells += '<td></td>';
     timeRows += '<tr class="time-row">' + cells + '</tr>';
   });
 
   // ── Total row ──
   var totalCells = '<td class="time-cell" style="font-weight:700;">Total</td>';
   regular.forEach(function() { totalCells += '<td></td>'; });
-  totalCells += '<td></td>';
+  if (hasCrisis) totalCells += '<td></td>';
   var totalRow = '<tr class="total-row">' + totalCells + '</tr>';
 
   // ── Notes row ──
@@ -1002,7 +1010,8 @@ function buildDatasheet(d) {
   // ── Colgroup ──
   var colgroup = '<colgroup><col style="width:60px;">'
     + regular.map(function() { return '<col>'; }).join('')
-    + '<col style="width:105px;"></colgroup>';
+    + (hasCrisis ? '<col style="width:105px;">' : '')
+    + '</colgroup>';
 
   // ── Definitions panel (listed in column order) ──
   var allInOrder = freqBehs.concat(durBehs).concat(crisis ? [crisis] : []);
@@ -1015,8 +1024,10 @@ function buildDatasheet(d) {
       + '</div>';
   });
 
-  // ── QR box ──
-  var qrContent = qrDataURL ? '<img src="' + qrDataURL + '" alt="QR">' : 'QR Code';
+  // ── QR box (only rendered when a QR image has been uploaded) ──
+  var qrBox = qrDataURL
+    ? '<div class="qr-box"><img src="' + qrDataURL + '" alt="QR"></div>'
+    : '';
 
   return '<div class="ds-body">'
     + '<div class="ds-main">'
@@ -1029,8 +1040,8 @@ function buildDatasheet(d) {
     + '<div class="ds-defs">' + defs + '</div>'
     + '</div>'
     + '<div class="ds-footer">'
-    + '<div class="qr-box">' + qrContent + '</div>'
-    + '<div class="hsb-label">HSB Datasheet</div>'
+    + qrBox
+    + '<div class="hsb-label" style="margin-left:auto;">HSB Datasheet</div>'
     + '</div>';
 }
 
@@ -1075,13 +1086,15 @@ function buildABCSheet() {
     rows += '<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
   }
 
-  var qrContent = qrDataURL ? '<img src="' + qrDataURL + '" alt="QR">' : 'QR Code';
+  var qrBox = qrDataURL
+    ? '<div class="qr-box"><img src="' + qrDataURL + '" alt="QR"></div>'
+    : '';
 
   return headerRow
     + '<table class="abc-table">' + colgroup + thead + '<tbody>' + rows + '</tbody></table>'
     + '<div class="ds-footer" style="margin-top:5px;">'
-    + '<div class="qr-box">' + qrContent + '</div>'
-    + '<div class="hsb-label">HSB Datasheet</div>'
+    + qrBox
+    + '<div class="hsb-label" style="margin-left:auto;">HSB Datasheet</div>'
     + '</div>';
 }
 
