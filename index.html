@@ -4,6 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>HSB Datasheet Creator</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* =====================================================================
    CREATOR UI
@@ -288,133 +291,81 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
    GENERATED DATASHEET  (shared by both sheet types)
 ===================================================================== */
 #datasheet {
-  background: white;
-  width: 10.5in;
-  min-height: 7.5in;
-  padding: 0.38in 0.4in;
-  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
-  font-family: Arial, Helvetica, sans-serif;
-  font-size: 10px;
-  display: flex;
-  flex-direction: column;
-  flex-shrink: 0;
-}
-
-/* ── BEHAVIOR SHEET ─────────────────────────────────────────── */
-.ds-body {
-  display: flex;
-  gap: 8px;
-  flex: 1;
-}
-.ds-main { flex: 1; min-width: 0; }
-.ds-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-}
-.ds-table td,
-.ds-table th {
-  border: 1px solid #222;
-  padding: 2px 3px;
-  font-size: 9.5px;
-  vertical-align: middle;
-  overflow: hidden;
-  word-break: break-word;
-}
-.h1-date    { font-weight: 700; font-size: 10.5px; white-space: nowrap; }
-.h1-middle  { padding: 4px; }
-.h1-student { font-weight: 700; font-size: 10.5px; text-align: center; }
-.h1-initials{ font-weight: 700; font-size: 16px; text-align: center; letter-spacing: 2px; }
-.h2-freq { font-size: 8.5px; padding: 3px 5px; }
-.h2-pct  { font-size: 8.5px; padding: 3px 5px; }
-.h2-dur  { font-size: 8.5px; padding: 3px 5px; }
-.h3-th {
-  font-weight: 700;
-  font-size: 9px;
-  text-align: center;
-  padding: 4px 2px;
+  position: relative;
   background: #fff;
-}
-.time-row td { height: 38px; }
-.time-cell { font-weight: 700; text-align: right; padding-right: 5px; font-size: 9px; white-space: nowrap; width: 60px; }
-.total-row td { font-weight: 700; font-size: 9.5px; padding: 4px 4px; }
-.notes-row td {
-  font-weight: 700;
-  font-size: 9.5px;
-  vertical-align: top;
-  padding: 5px 6px;
-  height: 161px;
-  border: none; /* open space, no box; Total row's bottom border is the only seam */
-}
-.ds-defs {
-  width: 192px;
+  width: 11in;
+  min-height: 8.5in;
+  padding: 0.35in;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.35);
+  font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+  color: #1a1a1a;
+  font-size: 10px;
   flex-shrink: 0;
-  border: 1px solid #222;
-  padding: 6px 7px;
-  font-size: 8.5px;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-  line-height: 1.3;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
 }
-.def-entry { }
-.def-name { font-weight: 700; text-decoration: underline; display: block; margin-bottom: 2px; font-size: 9px; }
 
-/* ── ABC SHEET ──────────────────────────────────────────────── */
-.abc-header-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid #222;
-  padding: 5px 10px;
-  margin-bottom: 5px;
-}
-.abc-header-title { font-size: 13px; font-weight: 700; }
-.abc-header-student { font-size: 16px; font-weight: 700; letter-spacing: 2px; }
-.abc-header-date { font-size: 11px; color: #444; }
-.abc-table {
-  width: 100%;
-  border-collapse: collapse;
-  table-layout: fixed;
-  flex: 1;
-}
-.abc-table th, .abc-table td {
-  border: 1px solid #222;
-  padding: 3px 5px;
-  font-size: 9.5px;
-  vertical-align: top;
-}
-.abc-table th { font-weight: 700; text-align: center; background: #fff; padding: 5px 4px; }
-.abc-table .abc-sub { font-size: 7.5px; font-weight: 400; color: #666; font-style: italic; display: block; }
-.abc-table td { height: 38px; }
+/* ── Letterhead ── */
+#datasheet .ds-letterhead { text-align: center; margin-bottom: 8px; }
+#datasheet .ds-kicker { font-size: 8.5px; letter-spacing: 3.5px; text-transform: uppercase; color: #888; font-weight: 600; margin-bottom: 3px; }
+#datasheet .ds-title { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; font-size: 21px; font-weight: 700; letter-spacing: 0.2px; color: #1a1a1a; line-height: 1.1; }
+#datasheet .ds-rule { border-top: 2px solid #333; margin: 6px 0 2px; }
+#datasheet .ds-rule-thin { border-top: 0.75px solid #333; margin: 0 0 9px; }
 
-/* ── SHARED FOOTER ──────────────────────────────────────────── */
-.ds-footer {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: 5px;
-}
-.qr-box {
-  width: 80px;
-  height: 80px;
-  border: 1px solid #bbb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 8px;
-  color: #bbb;
-  text-align: center;
-  flex-shrink: 0;
-}
-.qr-box img { max-width: 78px; max-height: 78px; }
-.hsb-label  { font-size: 8px; color: #888; font-style: italic; }
+/* ── Header field block ── */
+#datasheet .ds-headblock { display: flex; border: 1px solid #333; margin-bottom: 9px; }
+#datasheet .ds-field { flex: 1; padding: 6px 10px; border-right: 1px solid #333; display: flex; align-items: baseline; gap: 6px; min-width: 0; }
+#datasheet .ds-field:last-child { border-right: none; }
+#datasheet .ds-flabel { font-size: 8.5px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; color: #333; white-space: nowrap; }
+#datasheet .ds-fval { font-family: 'Source Serif 4', Georgia, serif; font-size: 12px; font-weight: 600; color: #1a1a1a; flex: 1; border-bottom: 0.75px solid #999; min-height: 15px; padding-bottom: 1px; }
+
+/* ── Body: table left, definitions right ── */
+#datasheet .ds-bodyrow { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 9px; }
+#datasheet .ds-tablecol { flex: 1 1 auto; min-width: 0; }
+#datasheet .ds-defscol { flex: 0 0 2.95in; }
+
+/* ── Data table ── */
+#datasheet .ds-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+#datasheet .ds-table th, #datasheet .ds-table td { border: 1px solid #333; }
+#datasheet .ds-group th { background: #e9e9e9; color: #1a1a1a; font-family: 'Source Serif 4', Georgia, serif; font-size: 8.5px; font-weight: 600; font-style: italic; padding: 3px 6px; text-align: center; letter-spacing: 0.2px; }
+#datasheet .ds-group th.ds-gblank { background: #fff; }
+#datasheet .ds-colrow th { background: #e6e6e6; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 4px; text-align: center; line-height: 1.15; color: #1a1a1a; }
+#datasheet .ds-table td { height: 0.335in; padding: 0; }
+#datasheet .ds-time { background: #f4f4f4; font-weight: 600; font-size: 10px; text-align: center; color: #1a1a1a; font-family: 'Source Serif 4', Georgia, serif; }
+#datasheet col.ds-timecol { width: 9%; }
+#datasheet .ds-total td { height: 0.30in; background: #e6e6e6; }
+#datasheet .ds-total td.ds-time { background: #e6e6e6; font-weight: 700; text-transform: uppercase; font-size: 9.5px; letter-spacing: 1px; }
+
+/* ── Definitions panel ── */
+#datasheet .ds-defs-panel { border: 1px solid #333; padding: 8px 10px 9px; }
+#datasheet .ds-defs-header { font-family: 'Source Serif 4', Georgia, serif; font-size: 10px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 6px; }
+#datasheet .ds-defs { display: flex; flex-direction: column; row-gap: 6px; }
+#datasheet .ds-def { font-size: 8.5px; line-height: 1.32; color: #2a2a2a; }
+#datasheet .ds-term { font-weight: 700; color: #1a1a1a; }
+#datasheet .ds-tag { font-style: italic; color: #777; font-weight: 400; }
+
+/* ── Misc notes (full-width, borderless) ── */
+#datasheet .ds-misc-label { font-family: 'Source Serif 4', Georgia, serif; font-size: 10px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 0.75px solid #333; padding-bottom: 3px; margin-bottom: 6px; }
+#datasheet .ds-misc-hint { font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif; font-style: italic; font-weight: 400; font-size: 8px; letter-spacing: 0.2px; text-transform: none; color: #888; }
+#datasheet .ds-misc-space { height: 1.5in; }
+
+/* ── ABC sheet table ── */
+#datasheet .ds-abc-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+#datasheet .ds-abc-table th, #datasheet .ds-abc-table td { border: 1px solid #333; padding: 3px 5px; font-size: 9.5px; vertical-align: top; }
+#datasheet .ds-abc-table th { background: #e6e6e6; font-weight: 700; text-align: center; text-transform: uppercase; letter-spacing: 0.5px; font-size: 8.5px; padding: 5px 4px; }
+#datasheet .ds-abc-table .ds-abc-sub { font-size: 7.5px; font-weight: 400; color: #666; font-style: italic; display: block; text-transform: none; letter-spacing: 0; }
+#datasheet .ds-abc-table td { height: 0.34in; }
+
+/* ── Footer + optional QR ── */
+#datasheet .ds-footer { position: absolute; bottom: 0.22in; left: 0.35in; right: 0.35in; text-align: center; }
+#datasheet .ds-brand { font-size: 8px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: #999; }
+#datasheet .ds-qr { position: absolute; bottom: 0.3in; right: 0.4in; width: 0.7in; height: 0.7in; object-fit: contain; }
 
 /* =====================================================================
    PRINT
 ===================================================================== */
 @media print {
-  @page { size: 11in 8.5in; margin: 0.2in; }
+  @page { size: 11in 8.5in; margin: 0; }
   /* Hide the editor and the preview toolbar; keep only the datasheet. */
   #creator,
   .preview-bar { display: none !important; }
@@ -425,9 +376,10 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
     display: block !important;
     overflow: visible !important;
   }
-  /* Print the datasheet at its true on-screen size so print matches preview. */
+  /* The datasheet is a full 11x8.5in landscape page; print it edge to edge. */
   #datasheet {
     box-shadow: none !important;
+    width: 11in !important;
     margin: 0 auto !important;
   }
 }
@@ -1196,105 +1148,85 @@ function buildDatasheet(d) {
   var nDur    = durBehs.length;
   var nTotal  = 1 + nReg + (hasCrisis ? 1 : 0); // time + regular (+ crisis if included)
 
-  // ── Row 1: Date | (middle span) | Student | Initials ──
-  var midSpan = nTotal - 3; // columns between "Date:" and "Student"
-  var dateValueCell = midSpan > 0
-    ? '<td class="h1-middle" colspan="' + midSpan + '" style="font-size:10.5px;padding:3px 6px;">'
-      + (dateStr ? esc(dateStr) : '') + '</td>'
-    : '';
-  var row1 = '<tr>'
-    + '<td class="h1-date">Date:</td>'
-    + dateValueCell
-    + '<td class="h1-student">Student</td>'
-    + '<td class="h1-initials">' + esc(initials) + '</td>'
-    + '</tr>';
+  // ── Header block: Student + Date (Date blank unless one was entered) ──
+  var headerBlock = '<div class="ds-headblock">'
+    + '<div class="ds-field"><span class="ds-flabel">Student</span><span class="ds-fval">' + esc(initials) + '</span></div>'
+    + '<div class="ds-field"><span class="ds-flabel">Date</span><span class="ds-fval">' + (dateStr ? esc(dateStr) : '&nbsp;') + '</span></div>'
+    + '</div>';
 
-  // ── Row 2: Frequency Measure | Duration ──
-  // Frequency spans: Time col + all frequency behavior cols
-  // Duration spans:  all duration behavior cols + Crisis col
-  var freqColspan = 1 + nFreq;
-  var pctColspan  = nPct;
-  var durColspan  = nDur + (hasCrisis ? 1 : 0);
-  var row2 = '<tr>'
-    + '<td colspan="' + freqColspan + '" class="h2-freq">'
-    + '<u><strong>Frequency Measure</strong></u>: Record data with Tallies of Occurrences of behaviors.&nbsp;(ex: III&nbsp;=&nbsp;3 tallies)'
-    + '</td>'
-    + (pctColspan > 0
-        ? '<td colspan="' + pctColspan + '" class="h2-pct">'
-          + '<u><strong>Percentage</strong></u>: Mark&nbsp;+&nbsp;(correct) or&nbsp;&minus;&nbsp;(incorrect); &#10003;/&#10007; also fine. Total&nbsp;=&nbsp;%&nbsp;correct.'
-          + '</td>'
-        : '')
-    + (durColspan > 0
-        ? '<td colspan="' + durColspan + '" class="h2-dur">'
-          + '<u><strong>Duration</strong></u>: Record minutes the episode lasted.&nbsp;(Ex:&nbsp;(5)&nbsp;=&nbsp;5&nbsp;min&nbsp;/&nbsp;(3)(4)&nbsp;=&nbsp;7&nbsp;min)'
-          + '</td>'
-        : '')
-    + '</tr>';
+  // ── Measure band: blank over Time, then Frequency | Percentage | Duration ──
+  var durSpan = nDur + (hasCrisis ? 1 : 0);
+  var groupCells = '<th class="ds-gblank"></th>';
+  if (nFreq > 0)   groupCells += '<th colspan="' + nFreq + '">Frequency Measure &mdash; record tallies (ex: III = 3)</th>';
+  if (nPct > 0)    groupCells += '<th colspan="' + nPct + '">Percentage &mdash; mark + correct / &minus; incorrect; Total = % correct</th>';
+  if (durSpan > 0) groupCells += '<th colspan="' + durSpan + '">Duration &mdash; record minutes</th>';
+  var groupRow = '<tr class="ds-group">' + groupCells + '</tr>';
 
-  // ── Row 3: Column headers ──
-  var thCells = '<th class="h3-th" style="width:60px;">Time</th>';
-  regular.forEach(function(b) { thCells += '<th class="h3-th">' + esc(b.name) + '</th>'; });
-  if (hasCrisis) thCells += '<th class="h3-th" style="width:105px;">' + esc(crisis.name) + '</th>';
-  var row3 = '<tr>' + thCells + '</tr>';
+  // ── Column header row ──
+  var colCells = '<th>Time</th>';
+  regular.forEach(function(b) { colCells += '<th>' + esc(b.name) + '</th>'; });
+  if (hasCrisis) colCells += '<th>' + esc(crisis.name) + '</th>';
+  var colRow = '<tr class="ds-colrow">' + colCells + '</tr>';
 
   // ── Time rows ──
   var timeRows = '';
   timeSlots.forEach(function(t) {
-    var cells = '<td class="time-cell">' + t + '</td>';
+    var cells = '<td class="ds-time">' + esc(t) + '</td>';
     regular.forEach(function() { cells += '<td></td>'; });
     if (hasCrisis) cells += '<td></td>';
-    timeRows += '<tr class="time-row">' + cells + '</tr>';
+    timeRows += '<tr>' + cells + '</tr>';
   });
 
   // ── Total row ──
-  var totalCells = '<td class="time-cell" style="font-weight:700;">Total</td>';
+  var totalCells = '<td class="ds-time">Total</td>';
   regular.forEach(function() { totalCells += '<td></td>'; });
   if (hasCrisis) totalCells += '<td></td>';
-  var totalRow = '<tr class="total-row">' + totalCells + '</tr>';
-
-  // ── Notes row ──
-  var notesRow = '<tr class="notes-row">'
-    + '<td colspan="' + nTotal + '">'
-    + '<strong>Misc</strong>'
-    + '</td></tr>';
+  var totalRow = '<tr class="ds-total">' + totalCells + '</tr>';
 
   // ── Colgroup ──
-  var colgroup = '<colgroup><col style="width:60px;">'
+  var colgroup = '<colgroup><col class="ds-timecol">'
     + regular.map(function() { return '<col>'; }).join('')
-    + (hasCrisis ? '<col style="width:105px;">' : '')
+    + (hasCrisis ? '<col>' : '')
     + '</colgroup>';
 
-  // ── Definitions panel (listed in column order) ──
+  // ── Definitions (column order) ──
   var allInOrder = freqBehs.concat(pctBehs).concat(durBehs).concat(crisis ? [crisis] : []);
   var defs = '';
   allInOrder.forEach(function(b) {
-    var label = b.measurement === 'duration' ? ' (Duration)'
-              : (b.measurement === 'percentage' ? ' (%)' : '');
-    defs += '<div class="def-entry">'
-      + '<span class="def-name">' + esc(b.name) + label + ':</span>'
-      + esc(b.definition)
-      + '</div>';
+    var tag = b.measurement === 'duration' ? '(Duration)'
+            : (b.measurement === 'percentage' ? '(%)' : '(Frequency)');
+    defs += '<div class="ds-def"><span class="ds-term">' + esc(b.name) + '</span> '
+      + '<span class="ds-tag">' + tag + '</span> &mdash; ' + esc(b.definition) + '</div>';
   });
 
-  // ── QR box (only rendered when a QR image has been uploaded) ──
-  var qrBox = qrDataURL
-    ? '<div class="qr-box"><img src="' + qrDataURL + '" alt="QR"></div>'
-    : '';
+  // ── Optional QR (only when an image was uploaded) ──
+  var qrImg = qrDataURL ? '<img class="ds-qr" src="' + qrDataURL + '" alt="QR">' : '';
 
-  return '<div class="ds-body">'
-    + '<div class="ds-main">'
-    + '<table class="ds-table">'
-    + colgroup
-    + '<tbody>'
-    + row1 + row2 + row3 + timeRows + totalRow + notesRow
-    + '</tbody></table>'
+  return ''
+    + '<div class="ds-letterhead">'
+    +   '<div class="ds-kicker">Confidential Student Record</div>'
+    +   '<div class="ds-title">School Data Collection Sheet</div>'
     + '</div>'
-    + '<div class="ds-defs">' + defs + '</div>'
+    + '<div class="ds-rule"></div><div class="ds-rule-thin"></div>'
+    + headerBlock
+    + '<div class="ds-bodyrow">'
+    +   '<div class="ds-tablecol">'
+    +     '<table class="ds-table">' + colgroup
+    +       '<thead>' + groupRow + colRow + '</thead>'
+    +       '<tbody>' + timeRows + totalRow + '</tbody>'
+    +     '</table>'
+    +   '</div>'
+    +   '<div class="ds-defscol"><div class="ds-defs-panel">'
+    +     '<div class="ds-defs-header">Operational Definitions</div>'
+    +     '<div class="ds-defs">' + defs + '</div>'
+    +   '</div></div>'
     + '</div>'
-    + '<div class="ds-footer">'
-    + qrBox
-    + '<div class="hsb-label" style="margin-left:auto;">HSB Datasheet</div>'
-    + '</div>';
+    + '<div class="ds-misc">'
+    +   '<div class="ds-misc-label">Misc Notes <span class="ds-misc-hint">(Enter notes from the day here &mdash; changes, incidents, or anything that should be documented.)</span></div>'
+    +   '<div class="ds-misc-space"></div>'
+    + '</div>'
+    + '<div class="ds-footer"><span class="ds-brand">HSB Datasheet</span></div>'
+    + qrImg;
 }
 
 // ===================================================================
@@ -1311,16 +1243,15 @@ function buildABCSheet() {
   var nRows = parseInt(document.getElementById('abc-rows').value, 10) || 18;
   if (nRows < 1) nRows = 1;
 
-  var headerRow = '<div class="abc-header-row">'
-    + '<div class="abc-header-title">ABC Data Collection Sheet</div>'
-    + '<div class="abc-header-student">' + esc(initials) + '</div>'
-    + '<div class="abc-header-date">' + (dateStr ? 'Date: ' + esc(dateStr) : 'Date: ___________') + '</div>'
+  var headerBlock = '<div class="ds-headblock">'
+    + '<div class="ds-field"><span class="ds-flabel">Student</span><span class="ds-fval">' + esc(initials) + '</span></div>'
+    + '<div class="ds-field"><span class="ds-flabel">Date</span><span class="ds-fval">' + (dateStr ? esc(dateStr) : '&nbsp;') + '</span></div>'
     + '</div>';
 
   var colgroup = '<colgroup>'
+    + '<col style="width:0.75in;">'
     + '<col style="width:0.7in;">'
-    + '<col style="width:0.65in;">'
-    + '<col style="width:1.0in;">'
+    + '<col style="width:1.05in;">'
     + '<col><col><col>'
     + '</colgroup>';
 
@@ -1328,9 +1259,9 @@ function buildABCSheet() {
     + '<th>Date</th>'
     + '<th>Time</th>'
     + '<th>Location</th>'
-    + '<th>Antecedent<span class="abc-sub">What happened before?</span></th>'
-    + '<th>Behavior<span class="abc-sub">What did the student do?</span></th>'
-    + '<th>Consequence<span class="abc-sub">What happened after?</span></th>'
+    + '<th>Antecedent<span class="ds-abc-sub">What happened before?</span></th>'
+    + '<th>Behavior<span class="ds-abc-sub">What did the student do?</span></th>'
+    + '<th>Consequence<span class="ds-abc-sub">What happened after?</span></th>'
     + '</tr></thead>';
 
   var rows = '';
@@ -1338,16 +1269,18 @@ function buildABCSheet() {
     rows += '<tr><td></td><td></td><td></td><td></td><td></td><td></td></tr>';
   }
 
-  var qrBox = qrDataURL
-    ? '<div class="qr-box"><img src="' + qrDataURL + '" alt="QR"></div>'
-    : '';
+  var qrImg = qrDataURL ? '<img class="ds-qr" src="' + qrDataURL + '" alt="QR">' : '';
 
-  return headerRow
-    + '<table class="abc-table">' + colgroup + thead + '<tbody>' + rows + '</tbody></table>'
-    + '<div class="ds-footer" style="margin-top:5px;">'
-    + qrBox
-    + '<div class="hsb-label" style="margin-left:auto;">HSB Datasheet</div>'
-    + '</div>';
+  return ''
+    + '<div class="ds-letterhead">'
+    +   '<div class="ds-kicker">Confidential Student Record</div>'
+    +   '<div class="ds-title">ABC Data Collection Sheet</div>'
+    + '</div>'
+    + '<div class="ds-rule"></div><div class="ds-rule-thin"></div>'
+    + headerBlock
+    + '<table class="ds-abc-table">' + colgroup + thead + '<tbody>' + rows + '</tbody></table>'
+    + '<div class="ds-footer"><span class="ds-brand">HSB Datasheet</span></div>'
+    + qrImg;
 }
 
 // ===================================================================
