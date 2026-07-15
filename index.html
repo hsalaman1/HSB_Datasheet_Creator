@@ -432,6 +432,241 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
   }
 }
 </style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+/* ============================================================
+   APPLE SKIN — creator UI only. The datasheet output (#datasheet,
+   .ds-*, .abc-*) and @media print are intentionally NOT targeted,
+   so printed sheets stay pixel-identical.
+   Tokens from VoltAgent/awesome-design-md · Apple DESIGN.md
+============================================================ */
+:root{
+  --ap-blue:#0066cc;
+  --ap-blue-focus:#0071e3;
+  --ap-ink:#1d1d1f;
+  --ap-muted:#6e6e73;
+  --ap-muted2:#86868b;
+  --ap-canvas:#ffffff;
+  --ap-parchment:#f5f5f7;
+  --ap-pearl:#fafafc;
+  --ap-hairline:#d2d2d7;
+  --ap-divider:#e8e8ed;
+  --ap-font:'Inter',-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,Roboto,Helvetica,Arial,sans-serif;
+}
+
+/* Page + container */
+body{
+  font-family:var(--ap-font);
+  background:var(--ap-parchment);
+  color:var(--ap-ink);
+  font-size:17px;
+  line-height:1.47;
+  letter-spacing:-0.01em;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+#creator{
+  max-width:820px;
+  margin:32px auto;
+  padding:40px 44px 56px;
+  background:var(--ap-canvas);
+  border:1px solid var(--ap-hairline);
+  border-radius:18px;
+}
+#creator h1{
+  font-size:34px;
+  font-weight:600;
+  letter-spacing:-0.5px;
+  color:var(--ap-ink);
+  margin-bottom:6px;
+}
+#creator .subtitle{
+  font-size:17px;
+  color:var(--ap-muted);
+  margin-bottom:36px;
+  letter-spacing:-0.01em;
+}
+
+/* Sections */
+#creator .section{ margin-bottom:36px; }
+#creator .section-title{
+  font-size:13px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:0.06em;
+  color:var(--ap-muted2);
+  border-bottom:1px solid var(--ap-divider);
+  padding-bottom:10px;
+  margin-bottom:18px;
+}
+
+/* Labels + inputs */
+#creator label{
+  font-size:12px;
+  font-weight:600;
+  text-transform:none;
+  letter-spacing:0;
+  color:var(--ap-muted);
+  margin-bottom:6px;
+}
+#creator input[type="text"],
+#creator input[type="date"],
+#creator input[type="number"],
+#creator select,
+#creator textarea{
+  background:var(--ap-canvas);
+  border:1px solid var(--ap-hairline);
+  border-radius:11px;
+  font-family:var(--ap-font);
+  font-size:16px;
+  color:var(--ap-ink);
+  padding:11px 14px;
+  transition:border-color .18s ease, box-shadow .18s ease;
+}
+#creator input:focus,
+#creator select:focus,
+#creator textarea:focus{
+  outline:none;
+  border-color:var(--ap-blue-focus);
+  box-shadow:0 0 0 4px rgba(0,113,227,0.15);
+  background:var(--ap-canvas);
+}
+
+/* Segmented / pill buttons */
+#creator .sheet-type-btn,
+#creator .sched-btn,
+#creator .meas-btn{
+  font-family:var(--ap-font);
+  border:1px solid var(--ap-hairline);
+  background:var(--ap-canvas);
+  color:var(--ap-ink);
+  border-radius:9999px;
+  transition:all .18s ease;
+}
+#creator .sheet-type-btn{ padding:11px 18px; font-size:15px; font-weight:500; }
+#creator .sched-btn{ padding:9px 18px; font-size:15px; }
+#creator .meas-btn{ padding:8px 14px; font-size:13px; }
+#creator .sheet-type-btn:hover,
+#creator .sched-btn:hover,
+#creator .meas-btn:hover{ border-color:var(--ap-ink); color:var(--ap-ink); }
+#creator .sheet-type-btn.active,
+#creator .sched-btn.active,
+#creator .meas-btn.active{
+  background:var(--ap-blue);
+  border-color:var(--ap-blue);
+  color:#fff;
+}
+#creator .sheet-type-btn:active,
+#creator .sched-btn:active,
+#creator .meas-btn:active,
+#creator .generate-btn:active,
+#creator .add-btn:active{ transform:scale(0.96); }
+
+/* Behavior cards */
+#creator .behavior-item{
+  border:1px solid var(--ap-hairline);
+  border-radius:12px;
+  background:var(--ap-canvas);
+  overflow:hidden;
+  transition:border-color .18s ease;
+}
+#creator .behavior-item.crisis-item{ border-color:var(--ap-hairline); background:var(--ap-pearl); }
+#creator .behavior-header{ padding:12px 14px; background:var(--ap-canvas); }
+#creator .behavior-header:hover{ background:var(--ap-parchment); }
+#creator .crisis-item .behavior-header{ background:var(--ap-pearl); }
+#creator .beh-check{ accent-color:var(--ap-blue); width:17px; height:17px; }
+#creator .behavior-body{ border-top:1px solid var(--ap-divider); background:var(--ap-canvas); }
+#creator .remove-beh-btn{ color:var(--ap-blue); text-decoration:none; }
+#creator .remove-beh-btn:hover{ text-decoration:underline; color:var(--ap-blue-focus); }
+
+/* Badges stay informative, just pill-rounded */
+#creator .badge{ border-radius:9999px; font-weight:600; }
+
+/* Add-custom + QR upload */
+#creator .add-btn{
+  font-family:var(--ap-font);
+  border:1.5px dashed var(--ap-hairline);
+  border-radius:12px;
+  color:var(--ap-blue);
+  background:var(--ap-canvas);
+  font-size:15px;
+  transition:all .18s ease;
+}
+#creator .add-btn:hover{ border-color:var(--ap-blue); color:var(--ap-blue-focus); background:var(--ap-parchment); }
+#creator .qr-drop{
+  border:1.5px dashed var(--ap-hairline);
+  border-radius:12px;
+  background:var(--ap-canvas);
+  transition:all .18s ease;
+}
+#creator .qr-drop:hover{ border-color:var(--ap-blue); background:var(--ap-parchment); }
+#creator .qr-remove{ color:var(--ap-blue); }
+
+/* Primary CTA — Apple blue pill */
+#creator .generate-btn{
+  font-family:var(--ap-font);
+  display:block;
+  width:auto;
+  min-width:240px;
+  margin:8px auto 0;
+  background:var(--ap-blue);
+  color:#fff;
+  border:none;
+  border-radius:9999px;
+  font-size:17px;
+  font-weight:500;
+  letter-spacing:-0.01em;
+  padding:14px 32px;
+  transition:background .18s ease, transform .1s ease;
+}
+#creator .generate-btn:hover{ background:var(--ap-blue-focus); }
+
+/* Preview bar — Apple black-nav grammar */
+.preview-bar{
+  background:#000;
+  padding:0 24px;
+  height:52px;
+}
+.preview-bar h2{ font-size:15px; font-weight:600; letter-spacing:-0.01em; color:#fff; }
+.btn-back,.btn-print{
+  font-family:var(--ap-font);
+  border-radius:9999px;
+  font-size:14px;
+  font-weight:500;
+  padding:8px 18px;
+  transition:all .18s ease;
+}
+.btn-back{ background:transparent; border:1px solid rgba(255,255,255,0.4); color:#fff; }
+.btn-back:hover{ background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.7); }
+.btn-print{ background:var(--ap-blue); border:1px solid var(--ap-blue); color:#fff; }
+.btn-print:hover{ background:var(--ap-blue-focus); border-color:var(--ap-blue-focus); }
+.btn-back:active,.btn-print:active{ transform:scale(0.96); }
+.preview-bg{ background:var(--ap-parchment); }
+
+/* Subtle Apple-style motion */
+@keyframes ap-fade-up{ from{opacity:0; transform:translateY(10px);} to{opacity:1; transform:translateY(0);} }
+@keyframes ap-fade-in{ from{opacity:0;} to{opacity:1;} }
+#creator .section{ animation:ap-fade-up .5s cubic-bezier(0.22,0.61,0.36,1) both; }
+#creator .section:nth-of-type(1){ animation-delay:.02s; }
+#creator .section:nth-of-type(2){ animation-delay:.06s; }
+#creator .section:nth-of-type(3){ animation-delay:.10s; }
+#creator .section:nth-of-type(4){ animation-delay:.14s; }
+#creator .section:nth-of-type(5){ animation-delay:.18s; }
+#creator .section:nth-of-type(6){ animation-delay:.22s; }
+#preview-section{ animation:ap-fade-in .4s ease both; }
+
+@media (prefers-reduced-motion: reduce){
+  #creator .section,
+  #preview-section{ animation:none; }
+  #creator .sheet-type-btn:active,
+  #creator .sched-btn:active,
+  #creator .meas-btn:active,
+  #creator .generate-btn:active,
+  #creator .add-btn:active,
+  .btn-back:active,.btn-print:active{ transform:none; }
+}
+
+</style>
 </head>
 <body>
 
