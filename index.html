@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HSB Datasheet Creator</title>
+<title>Datasheet Builder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -649,24 +649,377 @@ body{
 }
 
 </style>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+:root {
+  --orange-canvas: #faf9f5;
+  --orange-soft: #f5f0e8;
+  --orange-card: #efe9de;
+  --orange-dark: #181715;
+  --orange-on-dark: #faf9f5;
+  --orange-ink: #141413;
+  --orange-body: #3d3d3a;
+  --orange-muted: #6c6a64;
+  --orange-muted-soft: #8e8b82;
+  --orange-hairline: #e6dfd8;
+  --orange-accent: #ffbd59;
+  --orange-accent-press: #f2a93c;
+  --orange-shadow: 0 1px 3px rgba(20, 20, 19, 0.06);
+}
+
+body {
+  padding-top: 56px;
+  color: var(--orange-body);
+  background: var(--orange-canvas);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+.orange-nav {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 0;
+  z-index: 90;
+  display: flex;
+  height: 56px;
+  padding: 0 24px;
+  align-items: center;
+  gap: 14px;
+  background: var(--orange-canvas);
+  border-bottom: 1px solid var(--orange-hairline);
+}
+
+.orange-brand {
+  color: var(--orange-ink);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 25px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.orange-spacer { flex: 1; }
+
+#creator {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 34px 24px 68px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+}
+
+#creator::before { display: none; }
+
+#creator h1 {
+  margin: 0 0 4px;
+  color: var(--orange-ink);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 46px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  line-height: 1;
+}
+
+#creator .subtitle {
+  margin-bottom: 24px;
+  color: var(--orange-muted);
+  font-size: 16px;
+}
+
+#creator .privacy-note {
+  margin-bottom: 20px;
+  padding: 14px 16px;
+  color: var(--orange-body);
+  background: var(--orange-soft);
+  border: 1px solid var(--orange-hairline);
+  border-radius: 12px;
+  font-size: 13px;
+}
+
+#creator .section {
+  margin: 0 0 16px;
+  padding: 28px;
+  background: var(--orange-card);
+  border: 1px solid var(--orange-hairline);
+  border-radius: 12px;
+  box-shadow: var(--orange-shadow);
+}
+
+#creator .section-title {
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  color: var(--orange-ink);
+  border-bottom: 1px solid var(--orange-hairline);
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  text-transform: none;
+}
+
+#creator label {
+  color: var(--orange-muted);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+#creator input[type="text"],
+#creator input[type="search"],
+#creator input[type="date"],
+#creator input[type="number"],
+#creator select,
+#creator textarea {
+  width: 100%;
+  padding: 11px 14px;
+  color: var(--orange-ink);
+  background: #fffdf9;
+  border: 1px solid var(--orange-hairline);
+  border-radius: 8px;
+  box-shadow: none;
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+}
+
+#creator input:focus,
+#creator select:focus,
+#creator textarea:focus {
+  outline: none;
+  border-color: var(--orange-accent-press);
+  box-shadow: 0 0 0 3px rgba(240, 168, 56, 0.3);
+}
+
+#creator .sheet-type-btn,
+#creator .sched-btn,
+#creator .meas-btn,
+#creator .add-btn,
+#creator .action-btn {
+  color: var(--orange-ink);
+  background: var(--orange-canvas);
+  border: 1px solid var(--orange-hairline);
+  border-radius: 8px;
+  box-shadow: var(--orange-shadow);
+  font-family: 'Inter', sans-serif;
+  font-weight: 500;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease, box-shadow 160ms ease;
+}
+
+#creator .sheet-type-btn:hover,
+#creator .sched-btn:hover,
+#creator .meas-btn:hover,
+#creator .add-btn:hover,
+#creator .action-btn:hover {
+  color: var(--orange-ink);
+  background: var(--orange-soft);
+  border-color: #d8cfc4;
+  box-shadow: 0 5px 14px rgba(20, 20, 19, 0.09);
+  transform: translateY(-1px);
+}
+
+#creator .sheet-type-btn.active,
+#creator .sched-btn.active,
+#creator .meas-btn.active,
+#creator .action-btn.primary {
+  color: #16283a;
+  background: var(--orange-accent);
+  border-color: var(--orange-accent);
+}
+
+#creator .action-btn.primary:hover,
+#creator .sheet-type-btn.active:hover,
+#creator .sched-btn.active:hover,
+#creator .meas-btn.active:hover {
+  color: #16283a;
+  background: var(--orange-accent-press);
+  border-color: var(--orange-accent-press);
+}
+
+#creator .action-btn.library-import-primary,
+#creator label.action-btn.library-import-primary {
+  color: #fff !important;
+  background: var(--orange-dark);
+  border-color: var(--orange-dark);
+}
+
+#creator .action-btn.library-import-primary:hover,
+#creator label.action-btn.library-import-primary:hover {
+  color: #fff !important;
+  background: #2c2a27;
+  border-color: #2c2a27;
+}
+
+#creator .generate-btn {
+  width: 100%;
+  min-width: 0;
+  margin: 8px 0 0;
+  padding: 14px 32px;
+  color: #16283a;
+  background: var(--orange-accent);
+  border-radius: 8px;
+  box-shadow: 0 3px 10px rgba(181, 112, 26, 0.16);
+  font-family: 'Inter', sans-serif;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+#creator .generate-btn:hover {
+  background: var(--orange-accent-press);
+  box-shadow: 0 8px 20px rgba(181, 112, 26, 0.22);
+  transform: translateY(-2px);
+}
+
+#creator .behavior-item {
+  overflow: hidden;
+  background: var(--orange-canvas);
+  border: 1px solid var(--orange-hairline);
+  border-radius: 10px;
+  box-shadow: none;
+}
+
+#creator .behavior-item:has(.beh-check:checked) {
+  background: #fff2dc;
+  border-color: transparent;
+  box-shadow: inset 0 0 0 1.5px var(--orange-accent-press);
+}
+
+#creator .behavior-header,
+#creator .behavior-body { background: transparent; }
+#creator .behavior-header:hover { background: var(--orange-soft); }
+#creator .beh-check { width: 17px; height: 17px; accent-color: var(--orange-accent-press); }
+#creator .badge { color: var(--orange-muted); background: var(--orange-soft); border-color: var(--orange-hairline); }
+
+.behavior-tools {
+  display: flex;
+  margin-bottom: 14px;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.search-wrap { flex: 1; }
+.selected-count { padding-bottom: 12px; color: var(--orange-muted); font-size: 13px; font-weight: 600; white-space: nowrap; }
+.behavior-item.search-hidden { display: none; }
+
+.move-controls { display: inline-flex; gap: 3px; }
+#creator .move-controls button {
+  width: 27px;
+  height: 27px;
+  color: var(--orange-body);
+  background: var(--orange-canvas);
+  border: 1px solid var(--orange-hairline);
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+#creator .move-controls button:hover,
+#creator .move-controls button:focus-visible {
+  color: #895b19;
+  border-color: var(--orange-accent-press);
+  outline: none;
+}
+
+#creator .qr-drop {
+  background: var(--orange-canvas);
+  border-color: var(--orange-hairline);
+  border-radius: 10px;
+}
+#creator .qr-drop:hover { background: var(--orange-soft); border-color: #d8cfc4; }
+
+.section-help { margin: -4px 0 14px; color: var(--orange-muted); font-size: 13px; }
+.template-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.action-row { display: flex; margin-top: 14px; gap: 8px; flex-wrap: wrap; }
+#creator .action-btn {
+  appearance: none;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: none;
+}
+#creator .action-btn:focus-visible { outline: 3px solid rgba(240, 168, 56, 0.3); outline-offset: 1px; }
+#creator .action-btn.danger { color: #8a302b; }
+.file-btn { display: inline-flex; align-items: center; }
+.visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0, 0, 0, 0) !important; white-space: nowrap !important; border: 0 !important; }
+
+#creator .fit-status {
+  margin: 10px 0 16px;
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+}
+#creator .fit-status.ok { color: #41572c; background: #f1f5e9; border: 1px solid #d7dfc6; }
+#creator .fit-status.warn { color: #765019; background: #fff2dc; border: 1px solid #f0d19a; }
+#creator .fit-status.error { color: #8a302b; background: #fbe9e7; border: 1px solid #e7bdb9; }
+.inline-message { margin-top: 10px; color: var(--orange-muted); font-size: 13px; }
+#creator code { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: 0.92em; }
+
+.preview-bar { color: var(--orange-on-dark); background: var(--orange-dark); }
+.preview-bar h2 { font-family: 'Cormorant Garamond', Georgia, serif; font-size: 20px; font-weight: 600; }
+.btn-back { border-radius: 8px; border-color: #5a5752; box-shadow: none; }
+.btn-print { color: #16283a; background: var(--orange-accent); border-color: var(--orange-accent); border-radius: 8px; box-shadow: var(--orange-shadow); }
+.btn-print:hover { background: var(--orange-accent-press); border-color: var(--orange-accent-press); }
+.preview-bg { background: var(--orange-soft); }
+
+@media (max-width: 700px) {
+  body { padding-top: 52px; }
+  .orange-nav { height: 52px; padding: 0 16px; }
+  .orange-brand { font-size: 21px; }
+  #creator { padding: 26px 14px 48px; }
+  #creator h1 { font-size: 38px; }
+  #creator .section { padding: 20px 16px; }
+  .sheet-type-wrap,
+  .meas-toggle { flex-direction: column; }
+  .template-grid { grid-template-columns: 1fr; }
+  .behavior-tools { align-items: stretch; flex-direction: column; gap: 4px; }
+  .selected-count { padding: 0; }
+  .behavior-header { flex-wrap: wrap; }
+  .behavior-header .beh-name-display { min-width: calc(100% - 42px); }
+  .preview-bar { height: auto; min-height: 58px; padding: 10px 12px; gap: 8px; }
+  .preview-actions { gap: 6px; }
+  .btn-back,
+  .btn-print { padding: 8px 12px; }
+  .preview-bg { justify-content: flex-start; padding: 12px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #creator *,
+  #creator *::before,
+  #creator *::after { animation: none !important; transition-duration: 0.01ms !important; }
+  #creator button:hover { transform: none; }
+}
+
+@media print {
+  .orange-nav { display: none !important; }
+  body { padding-top: 0 !important; }
+}
+</style>
 </head>
 <body>
+
+<nav class="orange-nav" aria-label="Application">
+  <span class="orange-brand">Datasheet Builder</span>
+  <span class="orange-spacer"></span>
+</nav>
 
 <!-- ===================================================================
      CREATOR INTERFACE
 =================================================================== -->
 <div id="creator">
   <h1>Datasheet Builder</h1>
-  <p class="subtitle">Configure the collection format and create a clean, print-ready datasheet.</p>
+  <p class="subtitle">Build a practical, print-ready school datasheet with automatic page-fit guidance.</p>
+  <div class="privacy-note"><strong>Privacy:</strong> Student initials, dates, and QR images are never included in saved configurations.</div>
 
   <!-- SHEET TYPE -->
   <div class="section">
     <div class="section-title">Sheet Type</div>
     <div class="sheet-type-wrap">
-      <button class="sheet-type-btn active" id="btn-behavior" onclick="switchType('behavior')">
+      <button type="button" class="sheet-type-btn active" id="btn-behavior" aria-pressed="true" onclick="switchType('behavior')">
         Behavior Frequency / Duration
       </button>
-      <button class="sheet-type-btn" id="btn-abc" onclick="switchType('abc')">
+      <button type="button" class="sheet-type-btn" id="btn-abc" aria-pressed="false" onclick="switchType('abc')">
         ABC Data Collection
       </button>
     </div>
@@ -677,11 +1030,11 @@ body{
     <div class="section-title">Student Information</div>
     <div class="form-row">
       <div class="form-group">
-        <label>Student Initials</label>
+        <label for="student-initials">Student Initials</label>
         <input type="text" id="student-initials" placeholder="e.g. GYE or JBO" maxlength="10">
       </div>
       <div class="form-group">
-        <label>Date (Optional)</label>
+        <label for="sheet-date">Date (Optional)</label>
         <input type="date" id="sheet-date">
       </div>
     </div>
@@ -691,10 +1044,10 @@ body{
   <div class="section" id="section-mode">
     <div class="section-title">Collection Layout</div>
     <div class="sheet-type-wrap">
-      <button class="sheet-type-btn active" id="btn-mode-hour" onclick="switchMode('hour')">
+      <button type="button" class="sheet-type-btn active" id="btn-mode-hour" aria-pressed="true" onclick="switchMode('hour')">
         Per Hour &mdash; Time of Day (one day)
       </button>
-      <button class="sheet-type-btn" id="btn-mode-day" onclick="switchMode('day')">
+      <button type="button" class="sheet-type-btn" id="btn-mode-day" aria-pressed="false" onclick="switchMode('day')">
         Per Day &mdash; Multiple Days (one sheet)
       </button>
     </div>
@@ -708,22 +1061,22 @@ body{
   <div class="section" id="section-schedule">
     <div class="section-title">Schedule</div>
     <div class="sched-wrap">
-      <button class="sched-btn" onclick="selectSchedule(this,'elementary')">Elementary (8–3)</button>
-      <button class="sched-btn" onclick="selectSchedule(this,'middle')">Middle School (9–4)</button>
-      <button class="sched-btn" onclick="selectSchedule(this,'high')">High School (7–3)</button>
-      <button class="sched-btn" onclick="selectSchedule(this,'allday')">All Day (8–4)</button>
-      <button class="sched-btn" onclick="selectSchedule(this,'custom')">Custom</button>
+      <button type="button" class="sched-btn" data-schedule="elementary" aria-pressed="false" onclick="selectSchedule(this,'elementary')">Elementary (8–3)</button>
+      <button type="button" class="sched-btn" data-schedule="middle" aria-pressed="false" onclick="selectSchedule(this,'middle')">Middle School (9–4)</button>
+      <button type="button" class="sched-btn" data-schedule="high" aria-pressed="false" onclick="selectSchedule(this,'high')">High School (7–3)</button>
+      <button type="button" class="sched-btn" data-schedule="allday" aria-pressed="false" onclick="selectSchedule(this,'allday')">All Day (8–4)</button>
+      <button type="button" class="sched-btn" data-schedule="custom" aria-pressed="false" onclick="selectSchedule(this,'custom')">Custom</button>
     </div>
     <div id="custom-time-row">
       <div class="form-group">
-        <label>Start Time</label>
+        <label for="custom-start">Start Time</label>
         <select id="custom-start">
           <option>6:00 AM</option><option>7:00 AM</option>
           <option selected>8:00 AM</option><option>9:00 AM</option><option>10:00 AM</option>
         </select>
       </div>
       <div class="form-group">
-        <label>End Time</label>
+        <label for="custom-end">End Time</label>
         <select id="custom-end">
           <option>1:00 PM</option><option>2:00 PM</option>
           <option>3:00 PM</option><option selected>4:00 PM</option>
@@ -737,7 +1090,7 @@ body{
   <div class="section" id="section-days" style="display:none;">
     <div class="section-title">Days</div>
     <div class="form-group" style="max-width:220px;">
-      <label>Number of Day Rows</label>
+      <label for="day-rows">Number of Day Rows</label>
       <input type="number" id="day-rows" value="10" min="1" max="20">
     </div>
     <p style="font-size:12px;color:#666;margin-top:2px;">
@@ -748,29 +1101,36 @@ body{
   <!-- BEHAVIORS (behavior sheet only) -->
   <div class="section" id="section-behaviors">
     <div class="section-title">Behaviors</div>
+    <div class="behavior-tools">
+      <div class="search-wrap">
+        <label for="behavior-search">Search behavior library</label>
+        <input type="search" id="behavior-search" placeholder="Search names or definitions…" oninput="filterBehaviors(this.value)">
+      </div>
+      <div id="selected-count" class="selected-count" aria-live="polite"></div>
+    </div>
     <p style="font-size:12px;color:#666;margin-bottom:14px;">
       Check the behaviors to include. Click any row to expand and edit its name, definition, or measurement type.
-      <strong>Crisis is always included as the final column.</strong>
+      <strong>Crisis is optional; when selected, it remains the final column.</strong>
     </p>
     <div id="behavior-list"></div>
-    <button class="add-btn" onclick="addCustomBehavior()">+ Add Custom Behavior</button>
+    <button type="button" class="add-btn" onclick="addCustomBehavior()">+ Add Custom Behavior</button>
   </div>
 
   <!-- ABC OPTIONS (abc sheet only) -->
   <div class="section" id="section-abc" style="display:none;">
     <div class="section-title">ABC Sheet Options</div>
     <div class="form-group" style="max-width:200px;">
-      <label>Number of Data Rows</label>
-      <input type="number" id="abc-rows" value="18" min="5" max="40">
+      <label for="abc-rows">Number of Data Rows</label>
+      <input type="number" id="abc-rows" value="18" min="5" max="18">
     </div>
   </div>
 
   <!-- QR CODE -->
   <div class="section">
     <div class="section-title">QR Code (Optional)</div>
-    <div class="qr-drop" onclick="document.getElementById('qr-input').click()">
+    <div class="qr-drop" role="button" tabindex="0" aria-label="Upload QR code image" onclick="document.getElementById('qr-input').click()" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();this.click();}">
       <p><strong>Click to upload a QR code image</strong></p>
-      <p>PNG or JPG — placed in the bottom-left corner of the printed sheet</p>
+      <p>PNG or JPG — placed in the bottom-right corner of the printed sheet</p>
     </div>
     <input type="file" id="qr-input" accept="image/*" style="display:none" onchange="handleQR(event)">
     <div id="qr-preview-wrap">
@@ -779,7 +1139,36 @@ body{
     </div>
   </div>
 
-  <button class="generate-btn" onclick="generate()">Generate Datasheet</button>
+  <div class="section utility-section">
+    <div class="section-title">Saved Configurations</div>
+    <p class="section-help">Save reusable layouts on this device. Student initials, dates, and QR images are excluded.</p>
+    <div class="template-grid">
+      <div><label for="template-name">Configuration name</label><input type="text" id="template-name" placeholder="e.g. Elementary behavior sheet"></div>
+      <div><label for="template-select">Saved configurations</label><select id="template-select"><option value="">No saved configurations</option></select></div>
+    </div>
+    <div class="action-row">
+      <button type="button" class="action-btn primary" onclick="saveTemplate()">Save</button>
+      <button type="button" class="action-btn" onclick="loadSelectedTemplate()">Load</button>
+      <button type="button" class="action-btn danger" onclick="deleteSelectedTemplate()">Delete</button>
+      <button type="button" class="action-btn" onclick="exportSelectedTemplate()">Export JSON</button>
+      <label class="action-btn file-btn" for="template-import">Import configuration</label>
+      <input class="visually-hidden" type="file" id="template-import" accept=".json,application/json" onchange="importTemplate(event)">
+    </div>
+  </div>
+
+  <div class="section utility-section">
+    <div class="section-title">Behavior Definition Library</div>
+    <p class="section-help">Import reviewed definitions as selectable options. Expected fields: <code>name</code>, <code>definition</code>, and <code>measurement</code>.</p>
+    <div class="action-row">
+      <label class="action-btn library-import-primary file-btn" for="library-import">Import Behavior Library</label>
+      <input class="visually-hidden" type="file" id="library-import" accept=".json,application/json" onchange="importBehaviorLibrary(event)">
+      <button type="button" class="action-btn" onclick="exportBehaviorLibrary()">Export Current Library</button>
+    </div>
+    <div id="library-message" class="inline-message" aria-live="polite"></div>
+  </div>
+
+  <div id="fit-status" class="fit-status" role="status" aria-live="polite"></div>
+  <button type="button" class="generate-btn" onclick="generate()">Generate Datasheet</button>
 </div><!-- end #creator -->
 
 <!-- ===================================================================
@@ -935,12 +1324,15 @@ function switchType(type) {
   sheetType = type;
   document.getElementById('btn-behavior').classList.toggle('active', type === 'behavior');
   document.getElementById('btn-abc').classList.toggle('active', type === 'abc');
+  document.getElementById('btn-behavior').setAttribute('aria-pressed', String(type === 'behavior'));
+  document.getElementById('btn-abc').setAttribute('aria-pressed', String(type === 'abc'));
   var isBeh = type === 'behavior';
   document.getElementById('section-mode').style.display      = isBeh ? '' : 'none';
   document.getElementById('section-behaviors').style.display = isBeh ? '' : 'none';
   document.getElementById('section-abc').style.display       = type === 'abc' ? '' : 'none';
   // Schedule / Days visibility depends on both sheet type and collection mode.
   applyModeVisibility();
+  updatePrototypeStatus();
 }
 
 // ===================================================================
@@ -950,7 +1342,10 @@ function switchMode(mode) {
   collectMode = mode;
   document.getElementById('btn-mode-hour').classList.toggle('active', mode === 'hour');
   document.getElementById('btn-mode-day').classList.toggle('active', mode === 'day');
+  document.getElementById('btn-mode-hour').setAttribute('aria-pressed', String(mode === 'hour'));
+  document.getElementById('btn-mode-day').setAttribute('aria-pressed', String(mode === 'day'));
   applyModeVisibility();
+  updatePrototypeStatus();
 }
 
 function applyModeVisibility() {
@@ -983,44 +1378,52 @@ function makeBehaviorItem(beh) {
   // Crisis is checked by default but may now be unchecked to omit it from the sheet.
 
   var fixedBadge = beh.alwaysLast
-    ? '<span class="badge badge-fixed">Always Last</span>'
+    ? '<span class="badge badge-fixed">Final Column</span>'
     : (!beh.canRemove ? '<span class="badge badge-fixed">Standard</span>' : '');
 
   var removeBtn = beh.canRemove
-    ? '<button class="remove-beh-btn" onclick="removeBehavior(\'' + beh.id + '\')">Remove this behavior</button>'
+    ? '<button type="button" class="remove-beh-btn" onclick="removeBehavior(\'' + beh.id + '\')">Remove this behavior</button>'
     : '';
 
   // All behaviors (including crisis) are expandable to edit their definition
-  var arrowHtml   = '<span class="expand-arrow" id="arrow-' + beh.id + '">\u25BC</span>';
-  var headerClick = 'onclick="toggleBody(\'' + beh.id + '\')"';
+  var arrowHtml   = '<span class="expand-arrow" aria-hidden="true" id="arrow-' + beh.id + '">\u25BC</span>';
+  var headerClick = 'role="button" tabindex="0" aria-label="Edit ' + esc(beh.name || 'custom behavior') + ' details" aria-expanded="false" aria-controls="body-' + beh.id + '"'
+    + ' onclick="toggleBody(\'' + beh.id + '\')"'
+    + ' onkeydown="if(event.target===this&&(event.key===\'Enter\'||event.key===\' \')){event.preventDefault();toggleBody(\'' + beh.id + '\');}"';
+  var moveControls = beh.alwaysLast ? '' :
+    '<span class="move-controls">'
+    + '<button type="button" aria-label="Move ' + esc(beh.name || 'behavior') + ' up" onclick="event.stopPropagation();moveBehavior(\'' + beh.id + '\',-1)">↑</button>'
+    + '<button type="button" aria-label="Move ' + esc(beh.name || 'behavior') + ' down" onclick="event.stopPropagation();moveBehavior(\'' + beh.id + '\',1)">↓</button>'
+    + '</span>';
 
   div.innerHTML = [
     '<div class="behavior-header" ' + headerClick + '>',
-      '<input type="checkbox" class="beh-check" id="chk-' + beh.id + '" ' + checkAttr + ' onclick="event.stopPropagation()">',
+      '<input type="checkbox" class="beh-check" aria-label="Include ' + esc(beh.name || 'custom behavior') + '" id="chk-' + beh.id + '" ' + checkAttr + ' onclick="event.stopPropagation();updatePrototypeStatus()">',
       '<span class="beh-name-display" id="name-disp-' + beh.id + '">' + esc(beh.name) + '</span>',
       '<span class="badge ' + measClass + '" id="badge-' + beh.id + '">' + measLabel + '</span>',
       fixedBadge,
+      moveControls,
       arrowHtml,
     '</div>',
     '<div class="behavior-body" id="body-' + beh.id + '">',
       '<div class="form-group">',
-        '<label>Behavior Name</label>',
+        '<label for="beh-name-' + beh.id + '">Behavior Name</label>',
         '<input type="text" id="beh-name-' + beh.id + '" value="' + esc(beh.name) + '"',
         ' oninput="document.getElementById(\'name-disp-' + beh.id + '\').textContent=this.value||\'(no name)\'">',
       '</div>',
       '<div class="form-group">',
-        '<label>Definition</label>',
+        '<label for="beh-def-' + beh.id + '">Definition</label>',
         '<textarea id="beh-def-' + beh.id + '">' + esc(beh.definition) + '</textarea>',
       '</div>',
       '<div class="form-group">',
         '<label>Measurement</label>',
         '<div class="meas-toggle">',
-          '<button class="meas-btn' + freqActive + '" id="mfreq-' + beh.id + '"',
-          ' onclick="setMeas(\'' + beh.id + '\',\'frequency\')">Frequency / Tally</button>',
-          '<button class="meas-btn' + durActive + '" id="mdur-' + beh.id + '"',
-          ' onclick="setMeas(\'' + beh.id + '\',\'duration\')">Duration (minutes)</button>',
-          '<button class="meas-btn' + pctActive + '" id="mpct-' + beh.id + '"',
-          ' onclick="setMeas(\'' + beh.id + '\',\'percentage\')">Percentage (+/&minus;)</button>',
+          '<button type="button" class="meas-btn' + freqActive + '" id="mfreq-' + beh.id + '"',
+          ' aria-pressed="' + (beh.measurement === 'frequency') + '" onclick="setMeas(\'' + beh.id + '\',\'frequency\')">Frequency / Tally</button>',
+          '<button type="button" class="meas-btn' + durActive + '" id="mdur-' + beh.id + '"',
+          ' aria-pressed="' + (beh.measurement === 'duration') + '" onclick="setMeas(\'' + beh.id + '\',\'duration\')">Duration (minutes)</button>',
+          '<button type="button" class="meas-btn' + pctActive + '" id="mpct-' + beh.id + '"',
+          ' aria-pressed="' + (beh.measurement === 'percentage') + '" onclick="setMeas(\'' + beh.id + '\',\'percentage\')">Percentage (+/&minus;)</button>',
         '</div>',
       '</div>',
       removeBtn,
@@ -1035,6 +1438,8 @@ function toggleBody(id) {
   if (!body) return;
   var isOpen = body.classList.toggle('open');
   if (arrow) arrow.textContent = isOpen ? '\u25B2' : '\u25BC';
+  var header = body.previousElementSibling;
+  if (header) header.setAttribute('aria-expanded', String(isOpen));
 }
 
 function setMeas(id, type) {
@@ -1042,9 +1447,9 @@ function setMeas(id, type) {
   var dBtn  = document.getElementById('mdur-'  + id);
   var pBtn  = document.getElementById('mpct-'  + id);
   var badge = document.getElementById('badge-' + id);
-  if (fBtn)  fBtn.classList.toggle('active', type === 'frequency');
-  if (dBtn)  dBtn.classList.toggle('active', type === 'duration');
-  if (pBtn)  pBtn.classList.toggle('active', type === 'percentage');
+  if (fBtn)  { fBtn.classList.toggle('active', type === 'frequency'); fBtn.setAttribute('aria-pressed', String(type === 'frequency')); }
+  if (dBtn)  { dBtn.classList.toggle('active', type === 'duration'); dBtn.setAttribute('aria-pressed', String(type === 'duration')); }
+  if (pBtn)  { pBtn.classList.toggle('active', type === 'percentage'); pBtn.setAttribute('aria-pressed', String(type === 'percentage')); }
   if (badge) {
     var cls = type === 'duration' ? 'badge-dur'
             : (type === 'percentage' ? 'badge-pct' : 'badge-freq');
@@ -1053,11 +1458,13 @@ function setMeas(id, type) {
     badge.className   = 'badge ' + cls;
     badge.textContent = txt;
   }
+  updatePrototypeStatus();
 }
 
 function removeBehavior(id) {
   var el = document.getElementById('beh-item-' + id);
   if (el) el.remove();
+  updatePrototypeStatus();
 }
 
 // ===================================================================
@@ -1077,6 +1484,7 @@ function addCustomBehavior() {
   var list   = document.getElementById('behavior-list');
   if (crisis) { list.insertBefore(item, crisis); } else { list.appendChild(item); }
   toggleBody(id);
+  updatePrototypeStatus();
   setTimeout(function() {
     var ni = document.getElementById('beh-name-' + id);
     if (ni) ni.focus();
@@ -1087,10 +1495,12 @@ function addCustomBehavior() {
 //  SCHEDULE
 // ===================================================================
 function selectSchedule(btn, key) {
-  document.querySelectorAll('.sched-btn').forEach(function(b) { b.classList.remove('active'); });
+  document.querySelectorAll('.sched-btn').forEach(function(b) { b.classList.remove('active'); b.setAttribute('aria-pressed', 'false'); });
   btn.classList.add('active');
+  btn.setAttribute('aria-pressed', 'true');
   selectedSchedule = key;
   document.getElementById('custom-time-row').classList.toggle('visible', key === 'custom');
+  updatePrototypeStatus();
 }
 
 function getTimeSlots() {
@@ -1169,7 +1579,7 @@ function collectData() {
     var meas  = 'frequency';
     if (dBtn && dBtn.classList.contains('active'))      meas = 'duration';
     else if (pBtn && pBtn.classList.contains('active')) meas = 'percentage';
-    behaviors.push({ name: name, definition: def, measurement: meas });
+    behaviors.push({ id: id, name: name, definition: def, measurement: meas });
   });
   return {
     initials: initials, dateStr: dateStr, mode: collectMode,
@@ -1203,7 +1613,7 @@ function validate(d) {
     }
   }
   var nonCrisis = d.behaviors.filter(function(b) {
-    return b.name.toLowerCase().indexOf('crisis') < 0;
+    return b.id !== 'crisis';
   }).length;
   if (nonCrisis < 1) {
     alert('Please include at least one behavior.');
@@ -1237,7 +1647,7 @@ function buildDatasheet(d) {
   var pctBehs  = [];
   var durBehs  = [];
   behaviors.forEach(function(b) {
-    if (b.name.toLowerCase().indexOf('crisis') >= 0) { crisis = b; }
+    if (b.id === 'crisis') { crisis = b; }
     else if (b.measurement === 'duration')   { durBehs.push(b); }
     else if (b.measurement === 'percentage') { pctBehs.push(b); }
     else { freqBehs.push(b); }
@@ -1346,7 +1756,8 @@ function buildABCSheet() {
       { month: '2-digit', day: '2-digit', year: 'numeric' });
   }
   var nRows = parseInt(document.getElementById('abc-rows').value, 10) || 18;
-  if (nRows < 1) nRows = 1;
+  if (nRows < 5) nRows = 5;
+  if (nRows > 18) nRows = 18;
 
   var headerBlock = '<div class="ds-headblock">'
     + '<div class="ds-field"><span class="ds-flabel">Student</span><span class="ds-fval">' + esc(initials) + '</span></div>'
@@ -1392,6 +1803,12 @@ function buildABCSheet() {
 //  GENERATE / NAVIGATE
 // ===================================================================
 function generate() {
+  var fit = assessCurrentFit();
+  if (!fit.ok) {
+    alert(fit.message);
+    document.getElementById('fit-status').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    return;
+  }
   var ds = document.getElementById('datasheet');
   if (sheetType === 'abc') {
     var initials = document.getElementById('student-initials').value.trim();
@@ -1420,9 +1837,310 @@ function goBack() {
 }
 
 // ===================================================================
+//  SEARCH, PAGE FIT, SAVED CONFIGURATIONS, AND LIBRARY TRANSFER
+// ===================================================================
+function updatePrototypeStatus() {
+  var checks = Array.from(document.querySelectorAll('#behavior-list .beh-check'));
+  var selected = checks.filter(function(c) { return c.checked; }).length;
+  var count = document.getElementById('selected-count');
+  if (count) count.textContent = selected + ' selected · ' + checks.length + ' available';
+  var fit = assessCurrentFit();
+  var box = document.getElementById('fit-status');
+  if (box) {
+    box.className = 'fit-status ' + fit.level;
+    box.textContent = fit.message;
+  }
+}
+
+function assessCurrentFit() {
+  if (sheetType === 'abc') {
+    var rows = parseInt(document.getElementById('abc-rows').value, 10) || 18;
+    if (rows > 18) return { ok: false, level: 'error', message: 'Print fit: ABC sheets are limited to 18 rows per landscape page.' };
+    return { ok: true, level: 'ok', message: 'Print fit: ' + rows + ' ABC rows fit the one-page layout.' };
+  }
+  var checked = Array.from(document.querySelectorAll('#behavior-list .behavior-item')).filter(function(item) {
+    var checkbox = item.querySelector('.beh-check');
+    return checkbox && checkbox.checked;
+  });
+  if (checked.length > 10) return { ok: false, level: 'error', message: 'Print fit: More than 10 behaviors will not remain usable on one landscape page.' };
+  if (checked.length > 7) return { ok: true, level: 'warn', message: 'Print fit warning: ' + checked.length + ' behaviors will fit tightly. Review the preview before printing.' };
+  var chars = checked.reduce(function(total, item) {
+    var definition = item.querySelector('textarea');
+    return total + (definition ? definition.value.length : 0);
+  }, 0);
+  if (chars > 1800) return { ok: true, level: 'warn', message: 'Print fit warning: Definitions are lengthy and may crowd the page. Shorten them or use fewer behaviors.' };
+  return { ok: true, level: 'ok', message: 'Print fit: ' + checked.length + ' selected behavior columns are within the one-page guideline.' };
+}
+
+function filterBehaviors(query) {
+  var normalized = (query || '').trim().toLowerCase();
+  document.querySelectorAll('#behavior-list .behavior-item').forEach(function(item) {
+    var name = item.querySelector('.beh-name-display');
+    var definition = item.querySelector('textarea');
+    var haystack = ((name ? name.textContent : '') + ' ' + (definition ? definition.value : '')).toLowerCase();
+    item.classList.toggle('search-hidden', !!normalized && haystack.indexOf(normalized) < 0);
+  });
+}
+
+function moveBehavior(id, direction) {
+  var item = document.getElementById('beh-item-' + id);
+  if (!item || id === 'crisis') return;
+  if (direction < 0) {
+    var previous = item.previousElementSibling;
+    if (previous) item.parentNode.insertBefore(item, previous);
+  } else {
+    var next = item.nextElementSibling;
+    if (next && next.id !== 'beh-item-crisis') item.parentNode.insertBefore(next, item);
+  }
+  updatePrototypeStatus();
+}
+
+function captureConfiguration() {
+  var behaviors = [];
+  document.querySelectorAll('#behavior-list .behavior-item').forEach(function(item) {
+    var id = item.id.replace('beh-item-', '');
+    var active = item.querySelector('.meas-btn.active');
+    var name = item.querySelector('[id^="beh-name-"]');
+    var definition = item.querySelector('textarea');
+    var checkbox = item.querySelector('.beh-check');
+    behaviors.push({
+      id: id,
+      name: name ? name.value : '',
+      definition: definition ? definition.value : '',
+      measurement: active && active.id.indexOf('mdur-') === 0 ? 'duration' : (active && active.id.indexOf('mpct-') === 0 ? 'percentage' : 'frequency'),
+      checked: !!(checkbox && checkbox.checked),
+      canRemove: !!item.querySelector('.remove-beh-btn'),
+      alwaysLast: id === 'crisis'
+    });
+  });
+  return {
+    version: 1,
+    sheetType: sheetType,
+    collectMode: collectMode,
+    schedule: selectedSchedule,
+    customStart: document.getElementById('custom-start').value,
+    customEnd: document.getElementById('custom-end').value,
+    dayRows: document.getElementById('day-rows').value,
+    abcRows: document.getElementById('abc-rows').value,
+    behaviors: behaviors
+  };
+}
+
+function getTemplates() {
+  try { return JSON.parse(localStorage.getItem('hsb-datasheet-templates-v1') || '{}'); }
+  catch (error) { return {}; }
+}
+
+function setTemplates(templates) {
+  localStorage.setItem('hsb-datasheet-templates-v1', JSON.stringify(templates));
+  refreshTemplateSelect();
+}
+
+function refreshTemplateSelect() {
+  var select = document.getElementById('template-select');
+  if (!select) return;
+  var current = select.value;
+  var templates = getTemplates();
+  var names = Object.keys(templates).sort();
+  select.innerHTML = names.length ? '<option value="">Choose a saved configuration</option>' : '<option value="">No saved configurations</option>';
+  names.forEach(function(name) {
+    var option = document.createElement('option');
+    option.value = name;
+    option.textContent = name;
+    select.appendChild(option);
+  });
+  if (names.indexOf(current) >= 0) select.value = current;
+}
+
+function saveTemplate() {
+  var input = document.getElementById('template-name');
+  var name = input.value.trim();
+  if (!name) {
+    alert('Enter a configuration name.');
+    input.focus();
+    return;
+  }
+  var templates = getTemplates();
+  templates[name] = captureConfiguration();
+  setTemplates(templates);
+  document.getElementById('template-select').value = name;
+}
+
+function applyConfiguration(config) {
+  if (!config || !Array.isArray(config.behaviors)) {
+    alert('This configuration is not valid.');
+    return;
+  }
+  var list = document.getElementById('behavior-list');
+  list.innerHTML = '';
+  config.behaviors.forEach(function(raw) {
+    var id = String(raw.id || ('imported' + Math.random().toString(36).slice(2)));
+    var behavior = {
+      id: id,
+      name: String(raw.name || ''),
+      definition: String(raw.definition || ''),
+      measurement: ['frequency', 'duration', 'percentage'].indexOf(raw.measurement) >= 0 ? raw.measurement : 'frequency',
+      defaultOn: !!raw.checked,
+      canRemove: id === 'crisis' ? false : raw.canRemove !== false,
+      alwaysLast: id === 'crisis'
+    };
+    list.appendChild(makeBehaviorItem(behavior));
+  });
+  switchType(config.sheetType === 'abc' ? 'abc' : 'behavior');
+  switchMode(config.collectMode === 'day' ? 'day' : 'hour');
+  document.getElementById('day-rows').value = config.dayRows || 10;
+  document.getElementById('abc-rows').value = Math.min(18, parseInt(config.abcRows, 10) || 18);
+  document.getElementById('custom-start').value = config.customStart || '8:00 AM';
+  document.getElementById('custom-end').value = config.customEnd || '4:00 PM';
+  if (config.schedule) {
+    var scheduleButton = document.querySelector('[data-schedule="' + config.schedule + '"]');
+    if (scheduleButton) selectSchedule(scheduleButton, config.schedule);
+  }
+  updatePrototypeStatus();
+}
+
+function loadSelectedTemplate() {
+  var name = document.getElementById('template-select').value;
+  var templates = getTemplates();
+  if (!name || !templates[name]) {
+    alert('Choose a saved configuration.');
+    return;
+  }
+  applyConfiguration(templates[name]);
+}
+
+function deleteSelectedTemplate() {
+  var name = document.getElementById('template-select').value;
+  var templates = getTemplates();
+  if (!name || !templates[name]) {
+    alert('Choose a saved configuration.');
+    return;
+  }
+  delete templates[name];
+  setTemplates(templates);
+}
+
+function downloadJSON(filename, data) {
+  var blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var anchor = document.createElement('a');
+  anchor.href = url;
+  anchor.download = filename;
+  anchor.click();
+  setTimeout(function() { URL.revokeObjectURL(url); }, 500);
+}
+
+function exportSelectedTemplate() {
+  var name = document.getElementById('template-select').value;
+  var templates = getTemplates();
+  if (!name || !templates[name]) {
+    alert('Choose a saved configuration.');
+    return;
+  }
+  downloadJSON(name.replace(/[^a-z0-9]+/gi, '-').toLowerCase() + '.json', templates[name]);
+}
+
+function readJSONFile(file, onSuccess, label) {
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function() {
+    try { onSuccess(JSON.parse(reader.result)); }
+    catch (error) { alert('Could not import ' + label + ': ' + error.message); }
+  };
+  reader.readAsText(file);
+}
+
+function importTemplate(event) {
+  readJSONFile(event.target.files[0], function(data) {
+    if (!data || !Array.isArray(data.behaviors)) throw new Error('Configuration must include a behaviors array.');
+    applyConfiguration(data);
+    document.getElementById('template-name').value = 'Imported configuration';
+  }, 'configuration');
+  event.target.value = '';
+}
+
+function importBehaviorLibrary(event) {
+  readJSONFile(event.target.files[0], function(data) {
+    var items = Array.isArray(data) ? data : data.behaviors;
+    if (!Array.isArray(items)) throw new Error('Expected an array or a behaviors array.');
+    var existing = new Set(Array.from(document.querySelectorAll('.beh-name-display')).map(function(node) { return node.textContent.trim().toLowerCase(); }));
+    var saved = [];
+    var crisis = document.getElementById('beh-item-crisis');
+    var list = document.getElementById('behavior-list');
+    items.forEach(function(raw, index) {
+      var name = String(raw.name || '').trim();
+      var definition = String(raw.definition || '').trim();
+      if (!name || !definition || existing.has(name.toLowerCase())) return;
+      var measurement = ['frequency', 'duration', 'percentage'].indexOf(raw.measurement) >= 0 ? raw.measurement : 'frequency';
+      var behavior = { id: 'library-' + Date.now() + '-' + index, name: name, definition: definition, measurement: measurement, defaultOn: false, canRemove: true, alwaysLast: false };
+      var node = makeBehaviorItem(behavior);
+      if (crisis) list.insertBefore(node, crisis);
+      else list.appendChild(node);
+      existing.add(name.toLowerCase());
+      saved.push({ name: name, definition: definition, measurement: measurement });
+    });
+    var prior = [];
+    try { prior = JSON.parse(localStorage.getItem('hsb-custom-behavior-library-v1') || '[]'); }
+    catch (error) { prior = []; }
+    localStorage.setItem('hsb-custom-behavior-library-v1', JSON.stringify(prior.concat(saved)));
+    document.getElementById('library-message').textContent = saved.length + ' behavior definitions imported on this device.';
+    updatePrototypeStatus();
+  }, 'behavior library');
+  event.target.value = '';
+}
+
+function exportBehaviorLibrary() {
+  var data = Array.from(document.querySelectorAll('#behavior-list .behavior-item')).map(function(item) {
+    var active = item.querySelector('.meas-btn.active');
+    return {
+      name: item.querySelector('.beh-name-display').textContent,
+      definition: item.querySelector('textarea').value,
+      measurement: active && active.id.indexOf('mdur-') === 0 ? 'duration' : (active && active.id.indexOf('mpct-') === 0 ? 'percentage' : 'frequency')
+    };
+  });
+  downloadJSON('hsb-behavior-library.json', data);
+}
+
+function restoreImportedLibrary() {
+  var items = [];
+  try { items = JSON.parse(localStorage.getItem('hsb-custom-behavior-library-v1') || '[]'); }
+  catch (error) { items = []; }
+  if (!Array.isArray(items)) return;
+  var existing = new Set(Array.from(document.querySelectorAll('.beh-name-display')).map(function(node) { return node.textContent.trim().toLowerCase(); }));
+  var crisis = document.getElementById('beh-item-crisis');
+  var list = document.getElementById('behavior-list');
+  items.forEach(function(raw, index) {
+    if (!raw.name || existing.has(String(raw.name).toLowerCase())) return;
+    var behavior = {
+      id: 'saved-library-' + index,
+      name: String(raw.name),
+      definition: String(raw.definition || ''),
+      measurement: ['frequency', 'duration', 'percentage'].indexOf(raw.measurement) >= 0 ? raw.measurement : 'frequency',
+      defaultOn: false,
+      canRemove: true,
+      alwaysLast: false
+    };
+    var node = makeBehaviorItem(behavior);
+    if (crisis) list.insertBefore(node, crisis);
+    else list.appendChild(node);
+    existing.add(String(raw.name).toLowerCase());
+  });
+}
+
+function initPrototype() {
+  restoreImportedLibrary();
+  refreshTemplateSelect();
+  document.addEventListener('input', function(event) {
+    if (event.target.closest && event.target.closest('#creator')) updatePrototypeStatus();
+  });
+  updatePrototypeStatus();
+}
+
+// ===================================================================
 //  BOOT
 // ===================================================================
 init();
+initPrototype();
 </script>
 </body>
 </html>
