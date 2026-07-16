@@ -398,16 +398,16 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
    Tokens from VoltAgent/awesome-design-md · Apple DESIGN.md
 ============================================================ */
 :root{
-  --ap-blue:#0066cc;
-  --ap-blue-focus:#0071e3;
-  --ap-ink:#1d1d1f;
-  --ap-muted:#6e6e73;
-  --ap-muted2:#86868b;
-  --ap-canvas:#ffffff;
-  --ap-parchment:#f5f5f7;
-  --ap-pearl:#fafafc;
-  --ap-hairline:#d2d2d7;
-  --ap-divider:#e8e8ed;
+  --ap-blue:#c85f24;
+  --ap-blue-focus:#a94718;
+  --ap-ink:#28231f;
+  --ap-muted:#716a63;
+  --ap-muted2:#8b6d58;
+  --ap-canvas:#fffdf9;
+  --ap-parchment:#f7f2e9;
+  --ap-pearl:#fbf7f1;
+  --ap-hairline:#e8ded1;
+  --ap-divider:#eee5da;
   --ap-font:'Inter',-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",system-ui,Roboto,Helvetica,Arial,sans-serif;
 }
 
@@ -429,10 +429,21 @@ body{
   background:var(--ap-canvas);
   border:1px solid var(--ap-hairline);
   border-radius:18px;
+  box-shadow:0 24px 70px rgba(70,49,32,0.09);
+}
+#creator::before{
+  content:'DATASHEET WORKSPACE';
+  display:block;
+  margin-bottom:6px;
+  color:var(--ap-blue);
+  font-size:11px;
+  font-weight:700;
+  letter-spacing:0.16em;
 }
 #creator h1{
+  font-family:Georgia,'Times New Roman',serif;
   font-size:34px;
-  font-weight:600;
+  font-weight:700;
   letter-spacing:-0.5px;
   color:var(--ap-ink);
   margin-bottom:6px;
@@ -505,7 +516,12 @@ body{
 #creator .meas-btn{ padding:8px 14px; font-size:13px; }
 #creator .sheet-type-btn:hover,
 #creator .sched-btn:hover,
-#creator .meas-btn:hover{ border-color:var(--ap-ink); color:var(--ap-ink); }
+#creator .meas-btn:hover{
+  border-color:var(--ap-blue);
+  color:var(--ap-blue-focus);
+  transform:translateY(-1px);
+  box-shadow:0 6px 14px rgba(70,49,32,0.09);
+}
 #creator .sheet-type-btn.active,
 #creator .sched-btn.active,
 #creator .meas-btn.active{
@@ -525,8 +541,10 @@ body{
   border-radius:12px;
   background:var(--ap-canvas);
   overflow:hidden;
-  transition:border-color .18s ease;
+  box-shadow:0 3px 12px rgba(70,49,32,0.035);
+  transition:border-color .18s ease,box-shadow .18s ease,transform .18s ease;
 }
+#creator .behavior-item:hover{ box-shadow:0 9px 22px rgba(70,49,32,0.07); transform:translateY(-1px); }
 #creator .behavior-item.crisis-item{ border-color:var(--ap-hairline); background:var(--ap-pearl); }
 #creator .behavior-header{ padding:12px 14px; background:var(--ap-canvas); }
 #creator .behavior-header:hover{ background:var(--ap-parchment); }
@@ -559,7 +577,7 @@ body{
 #creator .qr-drop:hover{ border-color:var(--ap-blue); background:var(--ap-parchment); }
 #creator .qr-remove{ color:var(--ap-blue); }
 
-/* Primary CTA — Apple blue pill */
+/* Primary CTA */
 #creator .generate-btn{
   font-family:var(--ap-font);
   display:block;
@@ -574,13 +592,18 @@ body{
   font-weight:500;
   letter-spacing:-0.01em;
   padding:14px 32px;
-  transition:background .18s ease, transform .1s ease;
+  box-shadow:0 8px 18px rgba(200,95,36,0.22);
+  transition:background .18s ease, transform .16s ease, box-shadow .18s ease;
 }
-#creator .generate-btn:hover{ background:var(--ap-blue-focus); }
+#creator .generate-btn:hover{
+  background:var(--ap-blue-focus);
+  transform:translateY(-2px);
+  box-shadow:0 12px 24px rgba(169,71,24,0.25);
+}
 
-/* Preview bar — Apple black-nav grammar */
+/* Preview bar */
 .preview-bar{
-  background:#000;
+  background:#2d2722;
   padding:0 24px;
   height:52px;
 }
@@ -592,11 +615,13 @@ body{
   font-weight:500;
   padding:8px 18px;
   transition:all .18s ease;
+  box-shadow:0 3px 10px rgba(0,0,0,0.12);
 }
 .btn-back{ background:transparent; border:1px solid rgba(255,255,255,0.4); color:#fff; }
 .btn-back:hover{ background:rgba(255,255,255,0.12); border-color:rgba(255,255,255,0.7); }
 .btn-print{ background:var(--ap-blue); border:1px solid var(--ap-blue); color:#fff; }
 .btn-print:hover{ background:var(--ap-blue-focus); border-color:var(--ap-blue-focus); }
+.btn-back:hover,.btn-print:hover{ transform:translateY(-1px); }
 .btn-back:active,.btn-print:active{ transform:scale(0.96); }
 .preview-bg{ background:var(--ap-parchment); }
 
@@ -631,8 +656,8 @@ body{
      CREATOR INTERFACE
 =================================================================== -->
 <div id="creator">
-  <h1>HSB Datasheet Creator</h1>
-  <p class="subtitle">Fill out the form below, then click Generate to create a print-ready datasheet.</p>
+  <h1>Datasheet Builder</h1>
+  <p class="subtitle">Configure the collection format and create a clean, print-ready datasheet.</p>
 
   <!-- SHEET TYPE -->
   <div class="section">
