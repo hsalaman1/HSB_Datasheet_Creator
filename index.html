@@ -366,7 +366,7 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 /* ── Footer + optional QR ── */
 #datasheet .ds-footer { position: absolute; bottom: 0.22in; left: 0.35in; right: 0.35in; text-align: center; }
 #datasheet .ds-brand { font-size: 8px; font-weight: 500; letter-spacing: 1px; text-transform: uppercase; color: #999; }
-#datasheet .ds-qr { position: absolute; bottom: 0.3in; left: 0.4in; width: 0.7in; height: 0.7in; object-fit: contain; }
+#datasheet .ds-qr { position: absolute; bottom: 0.3in; right: 0.4in; width: 0.7in; height: 0.7in; object-fit: contain; }
 
 /* =====================================================================
    PRINT
@@ -1868,9 +1868,13 @@ function updatePrototypeStatus() {
 
 function assessCurrentFit() {
   if (sheetType === 'abc') {
-    var rows = parseInt(document.getElementById('abc-rows').value, 10) || 18;
-    if (rows > 18) return { ok: false, level: 'error', message: 'Print fit: ABC sheets are limited to 18 rows per landscape page.' };
+    var rows = parseInt(document.getElementById('abc-rows').value, 10) || 16;
+    if (rows > 16) return { ok: false, level: 'error', message: 'Print fit: ABC sheets are limited to 16 rows per landscape page.' };
     return { ok: true, level: 'ok', message: 'Print fit: ' + rows + ' ABC rows fit the one-page layout.' };
+  }
+  if (collectMode === 'day') {
+    var dayRows = parseInt(document.getElementById('day-rows').value, 10) || 10;
+    if (dayRows > 14) return { ok: false, level: 'error', message: 'Print fit: Per-Day sheets are limited to 14 rows per landscape page.' };
   }
   var checked = Array.from(document.querySelectorAll('#behavior-list .behavior-item')).filter(function(item) {
     var checkbox = item.querySelector('.beh-check');
@@ -1993,7 +1997,8 @@ function applyConfiguration(config) {
       id: id,
       name: String(raw.name || ''),
       definition: String(raw.definition || ''),
-      measurement: ['frequency', 'duration', 'percentage'].indexOf(raw.measurement) >= 0 ? raw.measurement : 'frequency',
+      measurement: id === 'crisis' ? 'duration'
+        : (['frequency', 'duration', 'percentage'].indexOf(raw.measurement) >= 0 ? raw.measurement : 'frequency'),
       defaultOn: !!raw.checked,
       canRemove: id === 'crisis' ? false : raw.canRemove !== false,
       alwaysLast: id === 'crisis'
@@ -2002,8 +2007,8 @@ function applyConfiguration(config) {
   });
   switchType(config.sheetType === 'abc' ? 'abc' : 'behavior');
   switchMode(config.collectMode === 'day' ? 'day' : 'hour');
-  document.getElementById('day-rows').value = config.dayRows || 10;
-  document.getElementById('abc-rows').value = Math.min(18, parseInt(config.abcRows, 10) || 18);
+  document.getElementById('day-rows').value = Math.min(14, parseInt(config.dayRows, 10) || 10);
+  document.getElementById('abc-rows').value = Math.min(16, parseInt(config.abcRows, 10) || 16);
   document.getElementById('custom-start').value = config.customStart || '8:00 AM';
   document.getElementById('custom-end').value = config.customEnd || '4:00 PM';
   if (config.schedule) {
