@@ -1973,8 +1973,8 @@ function applyConfiguration(config) {
   }
   var list = document.getElementById('behavior-list');
   list.innerHTML = '';
-  config.behaviors.forEach(function(raw) {
-    var id = String(raw.id || ('imported' + Math.random().toString(36).slice(2)));
+  config.behaviors.forEach(function(raw, index) {
+    var id = raw && raw.id === 'crisis' ? 'crisis' : ('imported-' + Date.now() + '-' + index);
     var behavior = {
       id: id,
       name: String(raw.name || ''),
