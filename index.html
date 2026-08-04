@@ -182,6 +182,8 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 }
 .meas-btn:hover { border-color: #333; }
 .meas-btn.active { border-color: #222; background: #222; color: #fff; }
+.meas-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+.meas-btn:disabled:hover { border-color: #ccc; }
 .remove-beh-btn {
   display: inline-block;
   margin-top: 10px;
@@ -522,6 +524,8 @@ body{
   transform:translateY(-1px);
   box-shadow:0 6px 14px rgba(70,49,32,0.09);
 }
+#creator .meas-btn:disabled{ opacity:.4; cursor:not-allowed; transform:none; box-shadow:none; }
+#creator .meas-btn:disabled:hover{ border-color:var(--ap-hairline); color:var(--ap-ink); }
 #creator .sheet-type-btn.active,
 #creator .sched-btn.active,
 #creator .meas-btn.active{
@@ -1091,10 +1095,10 @@ body {
     <div class="section-title">Days</div>
     <div class="form-group" style="max-width:220px;">
       <label for="day-rows">Number of Day Rows</label>
-      <input type="number" id="day-rows" value="10" min="1" max="20">
+      <input type="number" id="day-rows" value="10" min="1" max="14">
     </div>
     <p style="font-size:12px;color:#666;margin-top:2px;">
-      Each row is one day (blank date line to fill in). Up to 20 fit on a single landscape page.
+      Each row is one day (blank date line to fill in). Up to 14 fit on a single landscape page.
     </p>
   </div>
 
@@ -1110,7 +1114,7 @@ body {
     </div>
     <p style="font-size:12px;color:#666;margin-bottom:14px;">
       Check the behaviors to include. Click any row to expand and edit its name, definition, or measurement type.
-      <strong>Crisis is optional; when selected, it remains the final column.</strong>
+      <strong>Crisis is optional; when selected, it remains the final column and is always tracked by duration.</strong>
     </p>
     <div id="behavior-list"></div>
     <button type="button" class="add-btn" onclick="addCustomBehavior()">+ Add Custom Behavior</button>
@@ -1121,8 +1125,11 @@ body {
     <div class="section-title">ABC Sheet Options</div>
     <div class="form-group" style="max-width:200px;">
       <label for="abc-rows">Number of Data Rows</label>
-      <input type="number" id="abc-rows" value="18" min="5" max="18">
+      <input type="number" id="abc-rows" value="16" min="5" max="16">
     </div>
+    <p style="font-size:12px;color:#666;margin-top:2px;">
+      Up to 16 fit on a single landscape page.
+    </p>
   </div>
 
   <!-- QR CODE -->
@@ -1375,6 +1382,7 @@ function makeBehaviorItem(beh) {
   var measClass  = beh.measurement === 'duration' ? 'badge-dur'
                  : (beh.measurement === 'percentage' ? 'badge-pct' : 'badge-freq');
   var checkAttr  = (beh.alwaysLast || beh.defaultOn) ? 'checked' : '';
+  var measDisabled = beh.alwaysLast ? ' disabled title="Crisis is always tracked by duration"' : '';
   // Crisis is checked by default but may now be unchecked to omit it from the sheet.
 
   var fixedBadge = beh.alwaysLast
@@ -1418,11 +1426,11 @@ function makeBehaviorItem(beh) {
       '<div class="form-group">',
         '<label>Measurement</label>',
         '<div class="meas-toggle">',
-          '<button type="button" class="meas-btn' + freqActive + '" id="mfreq-' + beh.id + '"',
+          '<button type="button" class="meas-btn' + freqActive + '" id="mfreq-' + beh.id + '"' + measDisabled,
           ' aria-pressed="' + (beh.measurement === 'frequency') + '" onclick="setMeas(\'' + beh.id + '\',\'frequency\')">Frequency / Tally</button>',
           '<button type="button" class="meas-btn' + durActive + '" id="mdur-' + beh.id + '"',
           ' aria-pressed="' + (beh.measurement === 'duration') + '" onclick="setMeas(\'' + beh.id + '\',\'duration\')">Duration (minutes)</button>',
-          '<button type="button" class="meas-btn' + pctActive + '" id="mpct-' + beh.id + '"',
+          '<button type="button" class="meas-btn' + pctActive + '" id="mpct-' + beh.id + '"' + measDisabled,
           ' aria-pressed="' + (beh.measurement === 'percentage') + '" onclick="setMeas(\'' + beh.id + '\',\'percentage\')">Percentage (+/&minus;)</button>',
         '</div>',
       '</div>',
@@ -1554,7 +1562,7 @@ function collectData() {
   if (collectMode === 'day') {
     var nDays = parseInt(document.getElementById('day-rows').value, 10) || 10;
     if (nDays < 1)  nDays = 1;
-    if (nDays > 20) nDays = 20;
+    if (nDays > 14) nDays = 14;
     rowLabels = [];
     for (var i = 0; i < nDays; i++) rowLabels.push('');  // blank date lines
     firstColHeader = 'Date';
@@ -1755,9 +1763,9 @@ function buildABCSheet() {
     dateStr = new Date(dateVal + 'T12:00:00').toLocaleDateString('en-US',
       { month: '2-digit', day: '2-digit', year: 'numeric' });
   }
-  var nRows = parseInt(document.getElementById('abc-rows').value, 10) || 18;
-  if (nRows < 5) nRows = 5;
-  if (nRows > 18) nRows = 18;
+  var nRows = parseInt(document.getElementById('abc-rows').value, 10) || 16;
+  if (nRows < 5)  nRows = 5;
+  if (nRows > 16) nRows = 16;
 
   var headerBlock = '<div class="ds-headblock">'
     + '<div class="ds-field"><span class="ds-flabel">Student</span><span class="ds-fval">' + esc(initials) + '</span></div>'
@@ -1836,6 +1844,12 @@ function goBack() {
   window.scrollTo(0, 0);
 }
 
+window.addEventListener('beforeprint', function() {
+  if (document.getElementById('preview-section').style.display !== 'block') {
+    generate();
+  }
+});
+
 // ===================================================================
 //  SEARCH, PAGE FIT, SAVED CONFIGURATIONS, AND LIBRARY TRANSFER
 // ===================================================================
@@ -1854,9 +1868,13 @@ function updatePrototypeStatus() {
 
 function assessCurrentFit() {
   if (sheetType === 'abc') {
-    var rows = parseInt(document.getElementById('abc-rows').value, 10) || 18;
-    if (rows > 18) return { ok: false, level: 'error', message: 'Print fit: ABC sheets are limited to 18 rows per landscape page.' };
+    var rows = parseInt(document.getElementById('abc-rows').value, 10) || 16;
+    if (rows > 16) return { ok: false, level: 'error', message: 'Print fit: ABC sheets are limited to 16 rows per landscape page.' };
     return { ok: true, level: 'ok', message: 'Print fit: ' + rows + ' ABC rows fit the one-page layout.' };
+  }
+  if (collectMode === 'day') {
+    var dayRows = parseInt(document.getElementById('day-rows').value, 10) || 10;
+    if (dayRows > 14) return { ok: false, level: 'error', message: 'Print fit: Per-Day sheets are limited to 14 rows per landscape page.' };
   }
   var checked = Array.from(document.querySelectorAll('#behavior-list .behavior-item')).filter(function(item) {
     var checkbox = item.querySelector('.beh-check');
@@ -1979,7 +1997,8 @@ function applyConfiguration(config) {
       id: id,
       name: String(raw.name || ''),
       definition: String(raw.definition || ''),
-      measurement: ['frequency', 'duration', 'percentage'].indexOf(raw.measurement) >= 0 ? raw.measurement : 'frequency',
+      measurement: id === 'crisis' ? 'duration'
+        : (['frequency', 'duration', 'percentage'].indexOf(raw.measurement) >= 0 ? raw.measurement : 'frequency'),
       defaultOn: !!raw.checked,
       canRemove: id === 'crisis' ? false : raw.canRemove !== false,
       alwaysLast: id === 'crisis'
@@ -1988,8 +2007,8 @@ function applyConfiguration(config) {
   });
   switchType(config.sheetType === 'abc' ? 'abc' : 'behavior');
   switchMode(config.collectMode === 'day' ? 'day' : 'hour');
-  document.getElementById('day-rows').value = config.dayRows || 10;
-  document.getElementById('abc-rows').value = Math.min(18, parseInt(config.abcRows, 10) || 18);
+  document.getElementById('day-rows').value = Math.min(14, parseInt(config.dayRows, 10) || 10);
+  document.getElementById('abc-rows').value = Math.min(16, parseInt(config.abcRows, 10) || 16);
   document.getElementById('custom-start').value = config.customStart || '8:00 AM';
   document.getElementById('custom-end').value = config.customEnd || '4:00 PM';
   if (config.schedule) {
