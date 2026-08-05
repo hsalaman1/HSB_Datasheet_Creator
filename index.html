@@ -6,7 +6,6 @@
 <title>Datasheet Builder</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,wght@0,400;0,600;0,700;1,400&family=Source+Sans+3:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 /* =====================================================================
    CREATOR UI
@@ -297,7 +296,11 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
   min-height: 8.5in;
   padding: 0.35in;
   box-shadow: 0 4px 24px rgba(0,0,0,0.35);
-  font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif;
+  /* Datasheet typography: system fonts, so the print/PDF output never depends on a network fetch.
+     Carlito / Liberation Sans Narrow are the metric-compatible clones for machines without them. */
+  --ds-body: Calibri, Carlito, 'Segoe UI', Candara, Arial, sans-serif;
+  --ds-kicker-font: 'Arial Narrow', 'Liberation Sans Narrow', 'Nimbus Sans Narrow', Arial, sans-serif;
+  font-family: var(--ds-body);
   color: #1a1a1a;
   font-size: 10px;
   flex-shrink: 0;
@@ -307,8 +310,8 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 
 /* ── Letterhead ── */
 #datasheet .ds-letterhead { text-align: center; margin-bottom: 8px; }
-#datasheet .ds-kicker { font-size: 8.5px; letter-spacing: 3.5px; text-transform: uppercase; color: #888; font-weight: 600; margin-bottom: 3px; }
-#datasheet .ds-title { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; font-size: 21px; font-weight: 700; letter-spacing: 0.2px; color: #1a1a1a; line-height: 1.1; }
+#datasheet .ds-kicker { font-family: var(--ds-kicker-font); font-size: 8.5px; letter-spacing: 3.5px; text-transform: uppercase; color: #888; font-weight: 600; margin-bottom: 3px; }
+#datasheet .ds-title { font-family: var(--ds-body); font-size: 21px; font-weight: 700; letter-spacing: 0.2px; color: #1a1a1a; line-height: 1.1; }
 #datasheet .ds-rule { border-top: 2px solid #333; margin: 6px 0 2px; }
 #datasheet .ds-rule-thin { border-top: 0.75px solid #333; margin: 0 0 9px; }
 
@@ -317,7 +320,7 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 #datasheet .ds-field { flex: 1; padding: 6px 10px; border-right: 1px solid #333; display: flex; align-items: baseline; gap: 6px; min-width: 0; }
 #datasheet .ds-field:last-child { border-right: none; }
 #datasheet .ds-flabel { font-size: 8.5px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; color: #333; white-space: nowrap; }
-#datasheet .ds-fval { font-family: 'Source Serif 4', Georgia, serif; font-size: 12px; font-weight: 600; color: #1a1a1a; flex: 1; border-bottom: 0.75px solid #999; min-height: 15px; padding-bottom: 1px; }
+#datasheet .ds-fval { font-size: 12px; font-weight: 600; color: #1a1a1a; flex: 1; border-bottom: 0.75px solid #999; min-height: 15px; padding-bottom: 1px; }
 
 /* ── Body: table left, definitions right ── */
 #datasheet .ds-bodyrow { display: flex; gap: 16px; align-items: flex-start; margin-bottom: 9px; }
@@ -327,11 +330,11 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 /* ── Data table ── */
 #datasheet .ds-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 #datasheet .ds-table th, #datasheet .ds-table td { border: 1px solid #333; }
-#datasheet .ds-group th { background: #e9e9e9; color: #1a1a1a; font-family: 'Source Serif 4', Georgia, serif; font-size: 8.5px; font-weight: 600; font-style: italic; padding: 3px 6px; text-align: center; letter-spacing: 0.2px; }
+#datasheet .ds-group th { background: #e9e9e9; color: #1a1a1a; font-size: 8.5px; font-weight: 600; font-style: italic; padding: 3px 6px; text-align: center; letter-spacing: 0.2px; }
 #datasheet .ds-group th.ds-gblank { background: #fff; }
 #datasheet .ds-colrow th { background: #e6e6e6; font-size: 8.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; padding: 5px 4px; text-align: center; line-height: 1.15; color: #1a1a1a; }
 #datasheet .ds-table td { height: 0.335in; padding: 0; }
-#datasheet .ds-time { background: #f4f4f4; font-weight: 600; font-size: 10px; text-align: center; color: #1a1a1a; font-family: 'Source Serif 4', Georgia, serif; }
+#datasheet .ds-time { background: #f4f4f4; font-weight: 600; font-size: 10px; text-align: center; color: #1a1a1a; }
 #datasheet col.ds-timecol { width: 9%; }
 #datasheet .ds-total td { height: 0.30in; background: #e6e6e6; }
 #datasheet .ds-total td.ds-time { background: #e6e6e6; font-weight: 700; text-transform: uppercase; font-size: 9.5px; letter-spacing: 1px; }
@@ -343,15 +346,15 @@ textarea { resize: vertical; min-height: 72px; line-height: 1.4; }
 
 /* ── Definitions panel ── */
 #datasheet .ds-defs-panel { border: 1px solid #333; padding: 8px 10px 9px; }
-#datasheet .ds-defs-header { font-family: 'Source Serif 4', Georgia, serif; font-size: 10px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 6px; }
+#datasheet .ds-defs-header { font-size: 10px; font-weight: 700; color: #1a1a1a; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 1px solid #333; padding-bottom: 3px; margin-bottom: 6px; }
 #datasheet .ds-defs { display: flex; flex-direction: column; row-gap: 6px; }
 #datasheet .ds-def { font-size: 8.5px; line-height: 1.32; color: #2a2a2a; }
 #datasheet .ds-term { font-weight: 700; color: #1a1a1a; }
 #datasheet .ds-tag { font-style: italic; color: #777; font-weight: 400; }
 
 /* ── Misc notes (full-width, borderless) ── */
-#datasheet .ds-misc-label { font-family: 'Source Serif 4', Georgia, serif; font-size: 10px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 0.75px solid #333; padding-bottom: 3px; margin-bottom: 6px; }
-#datasheet .ds-misc-hint { font-family: 'Source Sans 3', 'Segoe UI', Arial, sans-serif; font-style: italic; font-weight: 400; font-size: 8px; letter-spacing: 0.2px; text-transform: none; color: #888; }
+#datasheet .ds-misc-label { font-size: 10px; font-weight: 700; color: #333; text-transform: uppercase; letter-spacing: 1.5px; border-bottom: 0.75px solid #333; padding-bottom: 3px; margin-bottom: 6px; }
+#datasheet .ds-misc-hint { font-style: italic; font-weight: 400; font-size: 8px; letter-spacing: 0.2px; text-transform: none; color: #888; }
 #datasheet .ds-misc-space { height: 1.5in; }
 
 /* ── ABC sheet table ── */
